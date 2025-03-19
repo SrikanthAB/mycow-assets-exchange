@@ -71,29 +71,26 @@ const Navbar = () => {
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </Button>
-                <Button as={Link} to="/profile" className="button-effect">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Button>
+                <Link to="/profile">
+                  <Button className="button-effect">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Button>
+                </Link>
               </>
             ) : (
               <>
-                <Button 
-                  as={Link} 
-                  to="/auth/login" 
-                  variant="outline" 
-                  className="button-effect"
-                >
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Sign In
-                </Button>
-                <Button 
-                  as={Link} 
-                  to="/auth/register" 
-                  className="button-effect"
-                >
-                  Register
-                </Button>
+                <Link to="/auth/login">
+                  <Button variant="outline" className="button-effect">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/auth/register">
+                  <Button className="button-effect">
+                    Register
+                  </Button>
+                </Link>
               </>
             )}
           </div>
@@ -130,14 +127,12 @@ const Navbar = () => {
               <div className="border-t my-2 border-border"></div>
               {user ? (
                 <>
-                  <Button 
-                    as={Link} 
-                    to="/profile" 
-                    className="w-full button-effect"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </Button>
+                  <Link to="/profile">
+                    <Button className="w-full button-effect">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Button>
+                  </Link>
                   <Button 
                     onClick={() => signOut()} 
                     variant="outline" 
@@ -149,22 +144,20 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <Button 
-                    as={Link} 
-                    to="/auth/login" 
-                    variant="outline" 
-                    className="w-full button-effect"
-                  >
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Sign In
-                  </Button>
-                  <Button 
-                    as={Link} 
-                    to="/auth/register" 
-                    className="w-full button-effect"
-                  >
-                    Register
-                  </Button>
+                  <Link to="/auth/login">
+                    <Button 
+                      variant="outline" 
+                      className="w-full button-effect"
+                    >
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link to="/auth/register">
+                    <Button className="w-full button-effect">
+                      Register
+                    </Button>
+                  </Link>
                 </>
               )}
             </nav>
