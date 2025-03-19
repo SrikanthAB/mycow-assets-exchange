@@ -2,12 +2,14 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, LogIn, User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
   
   const navLinks = [
     { title: "Home", path: "/" },
@@ -63,8 +65,37 @@ const Navbar = () => {
           
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" className="button-effect">Sign In</Button>
-            <Button className="button-effect">Register</Button>
+            {user ? (
+              <>
+                <Button variant="outline" className="button-effect" onClick={() => signOut()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </Button>
+                <Button as={Link} to="/profile" className="button-effect">
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  as={Link} 
+                  to="/auth/login" 
+                  variant="outline" 
+                  className="button-effect"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Button>
+                <Button 
+                  as={Link} 
+                  to="/auth/register" 
+                  className="button-effect"
+                >
+                  Register
+                </Button>
+              </>
+            )}
           </div>
           
           {/* Mobile Menu Button */}
@@ -97,10 +128,45 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="border-t my-2 border-border"></div>
-              <div className="flex flex-col space-y-3 px-4 pt-2">
-                <Button variant="outline" className="w-full button-effect">Sign In</Button>
-                <Button className="w-full button-effect">Register</Button>
-              </div>
+              {user ? (
+                <>
+                  <Button 
+                    as={Link} 
+                    to="/profile" 
+                    className="w-full button-effect"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Button>
+                  <Button 
+                    onClick={() => signOut()} 
+                    variant="outline" 
+                    className="w-full button-effect"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    as={Link} 
+                    to="/auth/login" 
+                    variant="outline" 
+                    className="w-full button-effect"
+                  >
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Button>
+                  <Button 
+                    as={Link} 
+                    to="/auth/register" 
+                    className="w-full button-effect"
+                  >
+                    Register
+                  </Button>
+                </>
+              )}
             </nav>
           </div>
         </div>
