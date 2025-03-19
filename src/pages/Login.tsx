@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Mail, Lock, AlertCircle, ArrowRight } from "lucide-react";
+import { Mail, Lock, AlertCircle, ArrowRight, RefreshCw } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -26,9 +26,11 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const { signIn } = useAuth();
+  const { signIn, resendConfirmationEmail } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [showResendOption, setShowResendOption] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -41,13 +43,34 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     setIsSubmitting(true);
     setError(null);
+    setShowResendOption(false);
     
     try {
       await signIn(data.email, data.password);
     } catch (err: any) {
       setError(err.message || "Failed to login. Please check your credentials.");
+      if (err.message?.includes("not confirmed")) {
+        setShowResendOption(true);
+      }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    const email = form.getValues("email");
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address to resend the confirmation");
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      await resendConfirmationEmail(email);
+    } catch (err: any) {
+      setError(err.message || "Failed to resend confirmation email.");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -68,6 +91,21 @@ const Login = () => {
             <AlertCircle className="h-4 w-4 mr-2" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
+        )}
+
+        {showResendOption && (
+          <div className="mt-4 text-center">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleResendConfirmation}
+              disabled={isResending}
+              className="mx-auto flex items-center gap-2"
+            >
+              {isResending ? "Sending..." : "Resend confirmation email"}
+              <RefreshCw className={`h-4 w-4 ${isResending ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
         )}
 
         <Form {...form}>

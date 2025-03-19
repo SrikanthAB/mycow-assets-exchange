@@ -12,6 +12,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  resendConfirmationEmail: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,22 +60,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
           },
+          emailRedirectTo: window.location.origin + "/auth/login",
         },
       });
 
       if (error) throw error;
       
-      toast({
-        title: "Account created",
-        description: "Please check your email to confirm your account.",
-      });
+      // Check if email confirmation is needed
+      if (data?.user && !data.user.confirmed_at) {
+        toast({
+          title: "Account created",
+          description: "Please check your email to confirm your account.",
+        });
+      } else {
+        toast({
+          title: "Account created",
+          description: "Your account has been created successfully.",
+        });
+      }
       
       navigate("/auth/login");
     } catch (error: any) {
@@ -89,12 +99,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("Email not confirmed")) {
+          toast({
+            variant: "destructive",
+            title: "Email not confirmed",
+            description: "Please check your email for the confirmation link or resend the confirmation email.",
+          });
+          return;
+        }
+        throw error;
+      }
       
       navigate("/");
     } catch (error: any) {
@@ -102,6 +122,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive",
         title: "Error",
         description: error.message || "Invalid login credentials.",
+      });
+      throw error;
+    }
+  };
+
+  const resendConfirmationEmail = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: window.location.origin + "/auth/login",
+        },
+      });
+
+      if (error) throw error;
+      
+      toast({
+        title: "Confirmation email sent",
+        description: "Please check your inbox for the confirmation link.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to resend confirmation email.",
       });
       throw error;
     }
@@ -128,6 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signIn,
     signOut,
+    resendConfirmationEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
