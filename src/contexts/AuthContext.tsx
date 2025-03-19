@@ -67,7 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: window.location.origin + "/auth/login",
+          // Use dynamic current origin for email redirect
+          emailRedirectTo: `${window.location.origin}/auth/login`,
         },
       });
 
@@ -133,7 +134,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: window.location.origin + "/auth/login",
+          // Use dynamic current origin for email redirect
+          emailRedirectTo: `${window.location.origin}/auth/login`,
         },
       });
 
