@@ -2,8 +2,11 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Hero = () => {
+  const { user } = useAuth();
+  
   return (
     <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
       {/* Background gradient */}
@@ -28,17 +31,22 @@ const Hero = () => {
             MyCow Exchange brings tokenized commercial real estate, digital gold, private credit, and more onto one unified platform with unmatched liquidity and accessibility.
           </p>
           
-          <div className="mt-10 flex flex-wrap justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <Button size="lg" className="button-effect shadow-button">
-              Start Trading
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" className="button-effect" asChild>
-              <Link to="/assets">
-                Explore Assets
-              </Link>
-            </Button>
-          </div>
+          {/* Conditional buttons based on authentication status */}
+          {!user ? (
+            <div className="mt-10 flex flex-wrap justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+              <Button size="lg" className="button-effect shadow-button" asChild>
+                <Link to="/login">
+                  Start Trading
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="button-effect" asChild>
+                <Link to="/markets">
+                  Explore Assets
+                </Link>
+              </Button>
+            </div>
+          ) : null}
           
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 animate-fade-in" style={{ animationDelay: '0.5s' }}>
             {[
