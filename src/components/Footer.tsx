@@ -51,10 +51,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="relative w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <div className="absolute w-6 h-6 bg-muted rounded-full"></div>
-                <div className="absolute w-4 h-4 bg-primary rounded-full"></div>
-              </div>
+              <img 
+                src="/lovable-uploads/2357ba2d-c9c0-46f4-8848-6384dd15da4b.png" 
+                alt="MyCow Logo" 
+                className="h-8 w-auto" 
+              />
               <span className="text-xl font-semibold tracking-tight">MyCow Exchange</span>
             </Link>
             

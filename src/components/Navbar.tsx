@@ -40,9 +40,11 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <div className="relative w-8 h-8 bg-gradient-to-br from-primary to-mycow-500 text-white rounded-lg flex items-center justify-center mr-2">
-                <span className="text-lg font-bold">M</span>
-              </div>
+              <img 
+                src="/lovable-uploads/2357ba2d-c9c0-46f4-8848-6384dd15da4b.png" 
+                alt="MyCow Logo" 
+                className="h-8 w-auto mr-2" 
+              />
               <span className="font-semibold text-xl">MyCow</span>
             </Link>
             
