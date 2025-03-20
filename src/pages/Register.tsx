@@ -51,6 +51,7 @@ const Register = () => {
     
     try {
       await signUp(data.email, data.password, data.fullName);
+      // The navigation to home page is handled in the signUp function now
     } catch (err: any) {
       setError(err.message || "Failed to create account. Please try again.");
     } finally {

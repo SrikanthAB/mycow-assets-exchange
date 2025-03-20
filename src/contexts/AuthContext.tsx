@@ -98,6 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      // First create the user without email confirmation
       const { error, data } = await supabase.auth.signUp({
         email,
         password,
@@ -105,27 +106,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             full_name: fullName,
           },
-          // Use dynamic current origin for email redirect
           emailRedirectTo: `${window.location.origin}`,
         },
       });
 
       if (error) throw error;
       
-      // Check if email confirmation is needed
-      if (data?.user && !data.user.confirmed_at) {
+      // If account was created successfully, immediately sign in the user
+      if (data?.user) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (signInError) throw signInError;
+        
         toast({
           title: "Account created",
-          description: "Please check your email to confirm your account.",
+          description: "Your account has been created and you're now signed in.",
         });
-      } else {
-        toast({
-          title: "Account created",
-          description: "Your account has been created successfully.",
-        });
+        
+        navigate("/");
       }
-      
-      navigate("/auth/login");
     } catch (error: any) {
       toast({
         variant: "destructive",
