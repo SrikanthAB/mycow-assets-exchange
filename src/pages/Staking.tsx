@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowUpRight, ChevronRight, Gem, Info } from "lucide-react";
 import { usePortfolio } from "@/contexts/PortfolioContext";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import YieldStrategyCard from "@/components/YieldStrategyCard";
 import StakeTokenModal from "@/components/StakeTokenModal";
 
 const yieldStrategies = [
@@ -51,15 +51,6 @@ const Staking = () => {
   const handleStake = (token: any) => {
     setSelectedToken(token);
     setIsStakeModalOpen(true);
-  };
-  
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case "Low": return "bg-green-500/10 text-green-600";
-      case "Medium": return "bg-amber-500/10 text-amber-600";
-      case "High": return "bg-red-500/10 text-red-600";
-      default: return "bg-primary/10 text-primary";
-    }
   };
   
   return (
@@ -187,57 +178,11 @@ const Staking = () => {
               </div>
               
               <div className="lg:col-span-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Yield Strategy</CardTitle>
-                    <CardDescription>
-                      Choose how to reinvest your yield
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ToggleGroup 
-                      type="single" 
-                      className="flex flex-col gap-3 w-full" 
-                      value={selectedStrategy}
-                      onValueChange={(value) => {
-                        if (value) setSelectedStrategy(value);
-                      }}
-                    >
-                      {yieldStrategies.map((strategy) => (
-                        <ToggleGroupItem 
-                          key={strategy.id} 
-                          value={strategy.id}
-                          className="w-full p-4 justify-start border data-[state=on]:border-primary data-[state=on]:bg-primary/5 rounded-lg"
-                        >
-                          <div className="flex flex-col items-start">
-                            <div className="flex justify-between w-full">
-                              <span className="font-medium">{strategy.name}</span>
-                              <Badge className={getRiskColor(strategy.risk)}>
-                                {strategy.risk} Risk
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-1">{strategy.description}</p>
-                            <div className="mt-2 text-sm flex items-center gap-2">
-                              <Gem size={14} className="text-primary" />
-                              <span className="text-primary">{strategy.expectedReturn}</span>
-                            </div>
-                          </div>
-                        </ToggleGroupItem>
-                      ))}
-                    </ToggleGroup>
-                    
-                    <Button className="w-full mt-6" onClick={() => {
-                      toast({
-                        title: "Strategy Updated",
-                        description: `Your yield reinvestment strategy has been updated to ${
-                          yieldStrategies.find(s => s.id === selectedStrategy)?.name
-                        }.`,
-                      });
-                    }}>
-                      Apply Strategy
-                    </Button>
-                  </CardContent>
-                </Card>
+                <YieldStrategyCard 
+                  strategies={yieldStrategies}
+                  selectedStrategy={selectedStrategy}
+                  setSelectedStrategy={setSelectedStrategy}
+                />
               </div>
             </div>
             
