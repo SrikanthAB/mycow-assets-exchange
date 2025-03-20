@@ -17,7 +17,7 @@ import NotFound from './pages/NotFound';
 import Staking from './pages/Staking';
 
 // Import contexts
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/auth';
 import { PortfolioProvider } from './contexts/PortfolioContext';
 
 // Import components
