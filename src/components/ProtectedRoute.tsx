@@ -1,10 +1,10 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate("/auth/login", { replace: true });
+      navigate("/login", { replace: true });
     }
   }, [user, loading, navigate]);
 
@@ -26,8 +26,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  // If not loading and we have a user, render the children
-  return user ? <>{children}</> : null;
+  // If not loading and we have a user, render the children or Outlet
+  return user ? <>{children || <Outlet />}</> : null;
 };
 
 export default ProtectedRoute;

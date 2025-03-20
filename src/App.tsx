@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { ThemeProvider } from "@/components/ui/theme-provider"
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from "./components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster"
 
 // Import pages
@@ -53,7 +54,13 @@ function App() {
                   <Route path="/staking" element={<Staking />} />
                   
                   {/* Protected Routes */}
-                  <Route element={<ProtectedRoute />}>
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <Outlet />
+                      </ProtectedRoute>
+                    }
+                  >
                     <Route path="/assets" element={<Assets />} />
                     <Route path="/swaps" element={<Swaps />} />
                     <Route path="/ibpls" element={<IBPLs />} />

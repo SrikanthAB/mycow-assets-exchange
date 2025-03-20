@@ -1,7 +1,8 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useTheme } from "@/components/ui/use-theme";
-import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { useTheme } from "next-themes";
+import { Moon as MoonIcon, Sun as SunIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,11 +21,17 @@ const HeaderLink: React.FC<HeaderLinkProps> = ({ to, children }) => {
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   
   const toggleMobileNav = () => {
     setIsMobileNavOpen(!isMobileNavOpen);
+  };
+  
+  const handleLogout = () => {
+    if (signOut) {
+      signOut();
+    }
   };
   
   return (
@@ -57,7 +64,7 @@ const Navbar = () => {
             </Button>
             
             {user ? (
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
                 Logout
               </Button>
             ) : (
@@ -102,7 +109,7 @@ const Navbar = () => {
             <HeaderLink to="/staking">Staking</HeaderLink>
             
             {user ? (
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
                 Logout
               </Button>
             ) : (
