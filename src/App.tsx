@@ -26,25 +26,13 @@ import ProtectedRoute from './components/ProtectedRoute';
 const queryClient = new QueryClient();
 
 function App() {
-  const [theme, setTheme] = React.useState<'light' | 'dark'>(
-    (localStorage.getItem('theme') as 'light' | 'dark') || 'dark'
-  );
-
-  React.useEffect(() => {
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <PortfolioProvider>
-          <ThemeProvider defaultTheme="dark" storageKey="theme-preference">
-            <BrowserRouter>
-              <div className="App">
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="dark" storageKey="theme-preference">
+          <AuthProvider>
+            <PortfolioProvider>
+              <div className="App min-h-screen flex flex-col">
                 <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Index />} />
@@ -54,13 +42,7 @@ function App() {
                   <Route path="/staking" element={<Staking />} />
                   
                   {/* Protected Routes */}
-                  <Route
-                    element={
-                      <ProtectedRoute>
-                        <Outlet />
-                      </ProtectedRoute>
-                    }
-                  >
+                  <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
                     <Route path="/assets" element={<Assets />} />
                     <Route path="/swaps" element={<Swaps />} />
                     <Route path="/ibpls" element={<IBPLs />} />
@@ -71,11 +53,11 @@ function App() {
                 </Routes>
               </div>
               <Toaster />
-            </BrowserRouter>
-          </ThemeProvider>
-        </PortfolioProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+            </PortfolioProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 }
 
