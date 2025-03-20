@@ -4,88 +4,97 @@ import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AssetCard from "./AssetCard";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import BuyTokenModal from "./BuyTokenModal";
 
 // Mock data for asset listings
 const assets = [
   {
-    id: 1,
+    id: "1",
     name: "Embassy REIT",
     symbol: "EMREIT",
     image: "",
     price: "₹356.42",
     change: 2.34,
     category: "Real Estate",
-    yield: "8.5% APY"
+    yield: "8.5% APY",
+    numericPrice: 356.42
   },
   {
-    id: 2,
+    id: "2",
     name: "Digital Gold",
     symbol: "DGOLD",
     image: "",
     price: "₹7,245.30",
     change: 0.87,
     category: "Commodity",
-    yield: "0.5% APY"
+    yield: "0.5% APY",
+    numericPrice: 7245.30
   },
   {
-    id: 3,
+    id: "3",
     name: "Movie Fund I",
     symbol: "MF01",
     image: "",
     price: "₹115.67",
     change: 12.43,
     category: "Entertainment",
-    yield: "14.2% APY"
+    yield: "14.2% APY",
+    numericPrice: 115.67
   },
   {
-    id: 4,
+    id: "4",
     name: "Credit Fund",
     symbol: "CRED",
     image: "",
     price: "₹1,043.21",
     change: -1.05,
     category: "Private Credit",
-    yield: "11.3% APY"
+    yield: "11.3% APY",
+    numericPrice: 1043.21
   },
   {
-    id: 5,
+    id: "5",
     name: "Gold Stablecoin",
     symbol: "XAUT",
     image: "",
     price: "₹7,249.12",
     change: 0.21,
     category: "Stablecoin",
-    yield: "2.1% APY"
+    yield: "2.1% APY",
+    numericPrice: 7249.12
   },
   {
-    id: 6,
+    id: "6",
     name: "MyCow Token",
     symbol: "MCT",
     image: "",
     price: "₹24.37",
     change: 5.63,
     category: "Native Token",
-    yield: "7.8% APY"
+    yield: "7.8% APY",
+    numericPrice: 24.37
   },
   {
-    id: 7,
+    id: "7",
     name: "Prestige Office",
     symbol: "POFF",
     image: "",
     price: "₹512.90",
     change: 1.45,
     category: "Real Estate",
-    yield: "9.2% APY"
+    yield: "9.2% APY",
+    numericPrice: 512.90
   },
   {
-    id: 8,
+    id: "8",
     name: "OTT Series Fund",
     symbol: "OTSF",
     image: "",
     price: "₹87.42",
     change: -2.31,
     category: "Entertainment",
-    yield: "16.5% APY"
+    yield: "16.5% APY",
+    numericPrice: 87.42
   }
 ];
 
@@ -101,10 +110,21 @@ const categories = [
 
 const MarketSection = () => {
   const [activeCategory, setActiveCategory] = useState("All Assets");
+  const [selectedAsset, setSelectedAsset] = useState<null | any>(null);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
   
   const filteredAssets = activeCategory === "All Assets" 
     ? assets 
     : assets.filter(asset => asset.category === activeCategory);
+  
+  const handleBuy = (asset: any) => {
+    const assetWithYield = {
+      ...asset,
+      yield: asset.yield // Make sure yield is explicitly passed
+    };
+    setSelectedAsset(assetWithYield);
+    setIsBuyModalOpen(true);
+  };
   
   return (
     <section className="py-16 md:py-24 overflow-hidden">
@@ -150,12 +170,21 @@ const MarketSection = () => {
                   change={asset.change}
                   category={asset.category}
                   yield={asset.yield}
+                  onBuy={() => handleBuy(asset)}
                 />
               ))}
             </div>
           </TabsContent>
         </Tabs>
       </div>
+      
+      {selectedAsset && (
+        <BuyTokenModal 
+          isOpen={isBuyModalOpen} 
+          onClose={() => setIsBuyModalOpen(false)} 
+          asset={selectedAsset}
+        />
+      )}
     </section>
   );
 };

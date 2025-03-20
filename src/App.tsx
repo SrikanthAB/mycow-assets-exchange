@@ -1,52 +1,75 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ThemeProvider } from "@/components/ui/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { PortfolioProvider } from "@/contexts/PortfolioContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
-import Markets from "./pages/Markets";
-import Assets from "./pages/Assets";
-import Swaps from "./pages/Swaps";
-import IBPLs from "./pages/IBPLs";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import NotFound from "./pages/NotFound";
+// Import pages
+import Index from './pages/Index';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Markets from './pages/Markets';
+import Assets from './pages/Assets';
+import Swaps from './pages/Swaps';
+import IBPLs from './pages/IBPLs';
+import NotFound from './pages/NotFound';
+import Staking from './pages/Staking';
+
+// Import contexts
+import { AuthProvider } from './contexts/AuthContext';
+import { PortfolioProvider } from './contexts/PortfolioContext';
+
+// Import components
+import ProtectedRoute from './components/ProtectedRoute';
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <PortfolioProvider>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/auth/login" element={<Login />} />
-              <Route path="/auth/register" element={<Register />} />
-              
-              {/* Protected routes */}
-              <Route path="/markets" element={<ProtectedRoute><Markets /></ProtectedRoute>} />
-              <Route path="/assets" element={<ProtectedRoute><Assets /></ProtectedRoute>} />
-              <Route path="/swaps" element={<ProtectedRoute><Swaps /></ProtectedRoute>} />
-              <Route path="/staking" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/ibpls" element={<ProtectedRoute><IBPLs /></ProtectedRoute>} />
-              
-              {/* 404 route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </PortfolioProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  const [theme, setTheme] = React.useState<'light' | 'dark'>(
+    (localStorage.getItem('theme') as 'light' | 'dark') || 'dark'
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <PortfolioProvider>
+          <ThemeProvider defaultTheme="dark" storageKey="theme-preference">
+            <BrowserRouter>
+              <div className="App">
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/markets" element={<Markets />} />
+                  <Route path="/staking" element={<Staking />} />
+                  
+                  {/* Protected Routes */}
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/assets" element={<Assets />} />
+                    <Route path="/swaps" element={<Swaps />} />
+                    <Route path="/ibpls" element={<IBPLs />} />
+                  </Route>
+                  
+                  {/* 404 Route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+              <Toaster />
+            </BrowserRouter>
+          </ThemeProvider>
+        </PortfolioProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
