@@ -2,8 +2,15 @@
 "use client"
 
 import * as React from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { type ThemeProviderProps } from "next-themes/dist/types"
+
+// Create a context with default values
+const ThemeContext = createContext({
+  theme: "",
+  setTheme: (theme: string) => {}
+})
 
 export function ThemeProvider({ 
   children, 
@@ -53,9 +60,33 @@ export function ThemeToggle() {
 }
 
 export const useTheme = () => {
-  const context = React.useContext(NextThemesProvider.Context)
+  const context = useContext(ThemeContext)
   if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider")
+    // Use a default implementation if outside provider
+    const [theme, setThemeState] = useState<string>("")
+    
+    useEffect(() => {
+      // Check for system preference or stored preference
+      const savedTheme = localStorage.getItem("mycow-theme-preference")
+      if (savedTheme) {
+        setThemeState(savedTheme)
+      } else {
+        const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+        setThemeState(isDark ? "dark" : "light")
+      }
+    }, [])
+    
+    const setTheme = (newTheme: string) => {
+      setThemeState(newTheme)
+      localStorage.setItem("mycow-theme-preference", newTheme)
+      if (newTheme === "dark") {
+        document.documentElement.classList.add("dark")
+      } else {
+        document.documentElement.classList.remove("dark")
+      }
+    }
+    
+    return { theme, setTheme }
   }
   return context
 }

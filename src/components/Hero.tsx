@@ -1,6 +1,7 @@
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -32,8 +33,10 @@ const Hero = () => {
               Start Trading
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button size="lg" variant="outline" className="button-effect">
-              Explore Assets
+            <Button size="lg" variant="outline" className="button-effect" asChild>
+              <Link to="/assets">
+                Explore Assets
+              </Link>
             </Button>
           </div>
           
