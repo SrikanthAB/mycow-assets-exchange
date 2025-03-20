@@ -29,7 +29,7 @@ function App() {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="dark" storageKey="theme-preference">
+        <ThemeProvider defaultTheme="system" storageKey="mycow-theme-preference">
           <AuthProvider>
             <PortfolioProvider>
               <div className="App min-h-screen flex flex-col">

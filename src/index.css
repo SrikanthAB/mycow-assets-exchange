@@ -75,6 +75,15 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 224 76% 48%;
+    
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 224 76% 48%;
   }
 }
 
@@ -127,7 +136,7 @@
 
 @layer components {
   .glass-effect {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-glass;
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-glass dark:bg-black/30 dark:border-white/10;
   }
   
   .glass-effect-dark {

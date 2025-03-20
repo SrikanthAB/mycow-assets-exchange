@@ -31,9 +31,9 @@ const YieldStrategyCard: React.FC<YieldStrategyCardProps> = ({
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case "Low": return "bg-green-500/10 text-green-600 border-green-200";
-      case "Medium": return "bg-amber-500/10 text-amber-600 border-amber-200";
-      case "High": return "bg-red-500/10 text-red-600 border-red-200";
+      case "Low": return "bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800";
+      case "Medium": return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800";
+      case "High": return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800";
       default: return "bg-primary/10 text-primary border-primary/20";
     }
   };
