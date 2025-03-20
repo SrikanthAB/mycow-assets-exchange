@@ -5,8 +5,11 @@ import MarketSection from "@/components/MarketSection";
 import Footer from "@/components/Footer";
 import { ArrowRight, BarChart2, Shield, RefreshCw, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { user } = useAuth();
+  
   const features = [
     {
       icon: <BarChart2 className="w-6 h-6" />,
@@ -74,32 +77,34 @@ const Index = () => {
         
         <MarketSection />
         
-        {/* CTA Section */}
-        <section className="py-16 md:py-24">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto bg-gradient-soft from-primary/10 to-mycow-500/10 rounded-2xl p-8 md:p-12 relative overflow-hidden animate-fade-in">
-              {/* Background elements */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-mycow-500/10 rounded-full blur-3xl"></div>
-              
-              <div className="relative z-10 text-center">
-                <h2 className="text-balance">Ready to Start Your Investment Journey?</h2>
-                <p className="mt-4 text-lg text-foreground/80 text-balance max-w-2xl mx-auto">
-                  Join thousands of investors who are already diversifying their portfolios with tokenized real-world assets on MyCow Exchange.
-                </p>
+        {/* CTA Section - Only shown to non-authenticated users */}
+        {!user && (
+          <section className="py-16 md:py-24">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto bg-gradient-soft from-primary/10 to-mycow-500/10 rounded-2xl p-8 md:p-12 relative overflow-hidden animate-fade-in">
+                {/* Background elements */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-mycow-500/10 rounded-full blur-3xl"></div>
                 
-                <div className="mt-8 flex flex-wrap justify-center gap-4">
-                  <Button size="lg" className="button-effect shadow-button">
-                    Create Free Account
-                  </Button>
-                  <Button size="lg" variant="outline" className="button-effect">
-                    Contact Sales
-                  </Button>
+                <div className="relative z-10 text-center">
+                  <h2 className="text-balance">Ready to Start Your Investment Journey?</h2>
+                  <p className="mt-4 text-lg text-foreground/80 text-balance max-w-2xl mx-auto">
+                    Join thousands of investors who are already diversifying their portfolios with tokenized real-world assets on MyCow Exchange.
+                  </p>
+                  
+                  <div className="mt-8 flex flex-wrap justify-center gap-4">
+                    <Button size="lg" className="button-effect shadow-button">
+                      Create Free Account
+                    </Button>
+                    <Button size="lg" variant="outline" className="button-effect">
+                      Contact Sales
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
       
       <Footer />
