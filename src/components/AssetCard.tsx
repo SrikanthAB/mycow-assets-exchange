@@ -1,6 +1,7 @@
 
 import { ArrowUpRight, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface AssetCardProps {
   name: string;
@@ -10,9 +11,10 @@ interface AssetCardProps {
   change: number;
   category: string;
   yield?: string;
+  onBuy?: () => void;
 }
 
-const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldValue }: AssetCardProps) => {
+const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldValue, onBuy }: AssetCardProps) => {
   const isPositiveChange = change >= 0;
   
   return (
@@ -66,6 +68,18 @@ const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldV
           </div>
         )}
       </div>
+      
+      {onBuy && (
+        <div className="mt-4 pt-4 border-t border-border">
+          <Button 
+            className="w-full"
+            size="sm"
+            onClick={onBuy}
+          >
+            Buy Token
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
