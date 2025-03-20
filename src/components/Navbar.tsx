@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Moon as MoonIcon, Sun as SunIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth";
 import { useTheme } from "@/components/ui/theme-provider";
 
 interface HeaderLinkProps {
