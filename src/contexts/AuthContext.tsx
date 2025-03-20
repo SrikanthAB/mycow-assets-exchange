@@ -25,6 +25,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if we have a access_token or refresh_token in the URL
+    // This happens when users click on the confirmation link in their email
+    const handleEmailConfirmation = async () => {
+      const hash = window.location.hash;
+      
+      if (hash && (hash.includes('access_token') || hash.includes('refresh_token'))) {
+        // The presence of these tokens means the email confirmation was successful
+        try {
+          const { data, error } = await supabase.auth.getSession();
+          
+          if (error) throw error;
+          
+          if (data?.session) {
+            toast({
+              title: "Email verified successfully",
+              description: "Your email has been verified and you're now logged in.",
+            });
+            navigate('/');
+          }
+        } catch (error: any) {
+          console.error("Email confirmation error:", error);
+          toast({
+            variant: "destructive",
+            title: "Verification failed",
+            description: error.message || "There was an error verifying your email.",
+          });
+        }
+      }
+    };
+
+    handleEmailConfirmation();
+
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
@@ -42,6 +74,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             title: "Signed out",
             description: "You have been signed out successfully.",
           });
+        } else if (event === 'USER_UPDATED') {
+          // This event fires when user details are updated, like email verification
+          toast({
+            title: "Profile updated",
+            description: "Your user profile has been updated.",
+          });
         }
       }
     );
@@ -56,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [toast, navigate]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
@@ -68,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             full_name: fullName,
           },
           // Use dynamic current origin for email redirect
-          emailRedirectTo: `${window.location.origin}/auth/login`,
+          emailRedirectTo: `${window.location.origin}`,
         },
       });
 
@@ -135,7 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         options: {
           // Use dynamic current origin for email redirect
-          emailRedirectTo: `${window.location.origin}/auth/login`,
+          emailRedirectTo: `${window.location.origin}`,
         },
       });
 

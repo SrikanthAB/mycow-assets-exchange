@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,6 +31,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [showResendOption, setShowResendOption] = useState(false);
+  const location = useLocation();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -39,6 +40,21 @@ const Login = () => {
       password: "",
     },
   });
+
+  // Check if we have a query parameter indicating email verification
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const verificationError = params.get('error_description');
+    
+    if (verificationError) {
+      if (verificationError.includes('Email link is invalid or has expired')) {
+        setError('The verification link is invalid or has expired. Please request a new one.');
+        setShowResendOption(true);
+      } else {
+        setError(verificationError);
+      }
+    }
+  }, [location]);
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsSubmitting(true);
