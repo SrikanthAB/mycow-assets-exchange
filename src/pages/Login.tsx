@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -185,7 +184,7 @@ const Login = () => {
           <p className="text-muted-foreground">
             Don't have an account?{" "}
             <Link
-              to="/auth/register"
+              to="/register"
               className="font-medium text-primary hover:text-primary/80"
             >
               Sign up
