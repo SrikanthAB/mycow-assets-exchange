@@ -119,7 +119,12 @@ const Markets = () => {
     : marketAssets.filter(asset => asset.category === activeCategory);
   
   const handleBuy = (asset: any) => {
-    setSelectedAsset(asset);
+    // Ensure the asset includes the yield property when passed to BuyTokenModal
+    const assetWithYield = {
+      ...asset,
+      yield: asset.yield // Make sure yield is explicitly passed
+    };
+    setSelectedAsset(assetWithYield);
     setIsBuyModalOpen(true);
   };
 

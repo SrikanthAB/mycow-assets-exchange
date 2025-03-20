@@ -16,6 +16,7 @@ interface BuyTokenModalProps {
     price: string;
     numericPrice: number;
     category: string;
+    yield?: string; // Make yield optional
   };
 }
 
@@ -53,7 +54,7 @@ const BuyTokenModal = ({ isOpen, onClose, asset }: BuyTokenModalProps) => {
           priceString: asset.price,
           change: 0, // Default change value
           balance: amount,
-          yield: asset.yield
+          yield: asset.yield // Now this is properly typed as optional
         });
       }
       
