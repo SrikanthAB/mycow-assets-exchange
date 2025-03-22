@@ -1,21 +1,8 @@
 import { Message, SupportRequest } from '../types';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-
-// Helper function to create a user message
-export const createUserMessage = (text: string): Message => ({
-  sender: 'user',
-  text,
-  timestamp: new Date(),
-});
-
-// Helper function to create a bot message
-export const createBotMessage = (text: string, options?: { isOption?: boolean, options?: Array<{id: string, text: string}>, isCallbackRequest?: boolean }): Message => ({
-  sender: 'bot',
-  text,
-  timestamp: new Date(),
-  ...options
-});
+import { createUserMessage, createBotMessage } from './messageCreators';
+import { handleAIError } from './errorHandlers';
 
 export const formatTime = (date: Date) => {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -177,19 +164,7 @@ export const sendMessage = async (
     
     setMessages((prev) => [...prev, botResponse]);
   } catch (error) {
-    console.error('Error in AI chat:', error);
-    toast({
-      title: "Error",
-      description: "There was a problem getting a response. Please try again.",
-      variant: "destructive",
-    });
-    
-    // Add fallback bot response
-    const errorResponse = createBotMessage(
-      "I'm having some technical difficulties right now. Please try again or connect with a live agent for assistance."
-    );
-    
-    setMessages((prev) => [...prev, errorResponse]);
+    handleAIError(error, setMessages);
   } finally {
     setIsLoading(false);
   }

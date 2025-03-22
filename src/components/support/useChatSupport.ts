@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Message, CallbackFormData } from './types';
 import { SUPPORT_QUESTIONS } from './constants';
@@ -10,6 +9,7 @@ import {
   getOpenRequestMessages,
   handleViewRequestStatus
 } from './handlers/messageUtils';
+import { createBotMessage } from './handlers/messageCreators';
 
 export const useChatSupport = (open: boolean, onClose: () => void) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -118,6 +118,3 @@ export const useChatSupport = (open: boolean, onClose: () => void) => {
     handleConnectAgent
   };
 };
-
-// Helper imports to properly type the bot message creation in this file
-import { createBotMessage } from './handlers/messageUtils';
