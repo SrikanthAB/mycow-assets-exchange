@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -20,8 +19,9 @@ import {
 import { FormEvent } from "react";
 
 const IBPLs = () => {
+  
   const { tokens, getTotalPortfolioValue, getAvailablePortfolioValue, addLoan, repayLoan, loans, walletBalance } = usePortfolio();
-  const totalValue = getAvailablePortfolioValue(); // Using available value instead of total
+  const availablePortfolioValue = getAvailablePortfolioValue(); // Only use available value
   const { toast } = useToast();
   
   const [loanAmount, setLoanAmount] = useState<number>(0);
@@ -32,10 +32,13 @@ const IBPLs = () => {
   const [selectedLoanId, setSelectedLoanId] = useState<string>("");
   
   // Max loan amount should be 66% of available portfolio value
-  const maxLoanAmount = totalValue * 0.66;
+  const maxLoanAmount = availablePortfolioValue * 0.66;
   const requiredCollateral = (loanAmount * collateralRatio) / 100;
   const interestRate = 9.5 + (150 - collateralRatio) * 0.05; // Base rate of 9.5%, increases as collateral ratio decreases
   const monthlyPayment = loanAmount * (interestRate/100/12) / (1 - Math.pow(1 + interestRate/100/12, -loanTerm));
+  
+  // Get only unlocked tokens for selection
+  const availableTokens = tokens.filter(t => !t.locked);
   
   // Get the selected token object
   const selectedTokenObj = tokens.find(t => t.id === selectedToken);
@@ -120,7 +123,7 @@ const IBPLs = () => {
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* New Loan Application */}
-              <div className="bg-background rounded-xl shadow-sm p-6">
+              <div className="bg-white rounded-xl shadow-sm p-6">
                 <h3 className="text-xl font-medium mb-6">Apply for a New Loan</h3>
                 
                 <div className="space-y-6">
@@ -129,7 +132,7 @@ const IBPLs = () => {
                     <div className="bg-muted/30 p-4 rounded-lg">
                       <div className="flex justify-between mb-2">
                         <span className="text-muted-foreground">Available Portfolio Value</span>
-                        <span className="font-medium">₹{totalValue.toLocaleString('en-IN')}</span>
+                        <span className="font-medium">₹{availablePortfolioValue.toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Max Loan Available</span>
@@ -174,17 +177,26 @@ const IBPLs = () => {
                   
                   <div>
                     <label className="block text-sm font-medium mb-2">Collateral Token</label>
-                    <select 
-                      className="w-full h-10 rounded-md border border-input bg-background px-3 py-2"
-                      value={selectedToken}
-                      onChange={(e) => setSelectedToken(e.target.value)}
-                    >
-                      {tokens.filter(token => !token.locked).map(token => (
-                        <option key={token.id} value={token.id}>
-                          {token.name} ({token.symbol}) - {token.balance.toFixed(2)} tokens
-                        </option>
-                      ))}
-                    </select>
+                    {availableTokens.length > 0 ? (
+                      <select 
+                        className="w-full h-10 rounded-md border border-input bg-background px-3 py-2"
+                        value={selectedToken}
+                        onChange={(e) => setSelectedToken(e.target.value)}
+                      >
+                        {availableTokens.map(token => (
+                          <option key={token.id} value={token.id}>
+                            {token.name} ({token.symbol}) - {token.balance.toFixed(2)} tokens
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-700 text-sm">
+                        <p className="flex items-center">
+                          <AlertTriangle size={16} className="mr-2" />
+                          No available tokens to use as collateral
+                        </p>
+                      </div>
+                    )}
                   </div>
                   
                   <div>
@@ -242,7 +254,7 @@ const IBPLs = () => {
                   
                   <Button 
                     className="w-full mt-4" 
-                    disabled={loanAmount <= 0 || loanAmount > maxLoanAmount || !hasEnoughCollateral}
+                    disabled={loanAmount <= 0 || loanAmount > maxLoanAmount || !hasEnoughCollateral || availableTokens.length === 0}
                     onClick={handleApplyForLoan}
                   >
                     Apply for Loan

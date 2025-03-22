@@ -1,7 +1,8 @@
 
-import { ArrowUpRight, TrendingUp, TrendingDown } from "lucide-react";
+import { ArrowUpRight, TrendingUp, TrendingDown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AssetCardProps {
   name: string;
@@ -12,9 +13,10 @@ interface AssetCardProps {
   category: string;
   yield?: string;
   onBuy?: () => void;
+  locked?: boolean;
 }
 
-const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldValue, onBuy }: AssetCardProps) => {
+const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldValue, onBuy, locked }: AssetCardProps) => {
   const isPositiveChange = change >= 0;
   
   return (
@@ -31,7 +33,21 @@ const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldV
             )}
           </div>
           <div className="ml-3">
-            <h4 className="font-medium">{name}</h4>
+            <div className="flex items-center">
+              <h4 className="font-medium">{name}</h4>
+              {locked && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Lock size={16} className="ml-2 text-amber-500" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">This asset is locked as collateral for a loan</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
             <div className="text-xs text-muted-foreground flex items-center">
               <span className="bg-secondary px-1.5 py-0.5 rounded text-xs mr-2">{category}</span>
               <span>{symbol}</span>
@@ -75,8 +91,9 @@ const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldV
             className="w-full"
             size="sm"
             onClick={onBuy}
+            disabled={locked}
           >
-            Buy Token
+            {locked ? "Locked" : "Buy Token"}
           </Button>
         </div>
       )}
