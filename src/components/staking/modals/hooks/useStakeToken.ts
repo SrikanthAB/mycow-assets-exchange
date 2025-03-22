@@ -40,9 +40,9 @@ export const useStakeToken = ({ initialToken, tokens, strategy, onOpenChange }: 
     }
   }, [selectedToken]);
   
-  // Safely get the token yield rate
+  // Safely get the token yield rate - fixed to correctly parse percentage values
   const currentYield = selectedToken?.yield 
-    ? parseFloat(selectedToken.yield.replace(/[^0-9.]/g, '')) 
+    ? parseFloat(selectedToken.yield.replace(/[^\d.]/g, '')) 
     : 0;
     
   const strategyYield = strategy 
