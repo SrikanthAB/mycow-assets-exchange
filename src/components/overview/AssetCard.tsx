@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Token } from "@/contexts/portfolio/types";
 import { TrendingUp, TrendingDown, Lock, Info } from "lucide-react";
@@ -6,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import SellAssetModal from "./SellAssetModal";
-import AssetDetailsModal from "@/components/AssetDetailsModal";
+import AssetDetailsModal from "@/components/asset-details/AssetDetailsModal";
 
 interface AssetCardProps {
   token: Token;
