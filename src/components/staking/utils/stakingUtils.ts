@@ -57,17 +57,18 @@ export function calculateYieldStats(totalStakedValue: number) {
  */
 export function calculateCategoryBreakdown(stakedTokens: any[], totalStakedValue: number) {
   // Calculate breakdown of staked assets by category
-  const categoryBreakdown = stakedTokens.reduce((acc, token) => {
+  const categoryBreakdown: Record<string, { value: number, percentage: number }> = {};
+  
+  stakedTokens.forEach(token => {
     const category = token.category;
     const value = token.price * token.balance;
     
-    if (!acc[category]) {
-      acc[category] = { value: 0, percentage: 0 };
+    if (!categoryBreakdown[category]) {
+      categoryBreakdown[category] = { value: 0, percentage: 0 };
     }
     
-    acc[category].value += value;
-    return acc;
-  }, {} as Record<string, { value: number, percentage: number }>);
+    categoryBreakdown[category].value += value;
+  });
   
   // Calculate percentages
   if (totalStakedValue > 0) {
@@ -79,9 +80,9 @@ export function calculateCategoryBreakdown(stakedTokens: any[], totalStakedValue
   // Sort categories by value (descending)
   const sortedCategories = Object.entries(categoryBreakdown)
     .sort(([, a], [, b]) => b.value - a.value)
-    .map(([category, { percentage }]) => ({ 
+    .map(([category, data]) => ({ 
       category, 
-      percentage,
+      percentage: data.percentage,
       color: getCategoryColor(category)
     }));
   
