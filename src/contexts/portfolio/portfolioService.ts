@@ -1,13 +1,22 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Transaction } from "./types";
-import { User } from "@supabase/supabase-js";
 
 export const fetchTransactions = async () => {
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.error('No authenticated user found when fetching transactions');
+      return [];
+    }
+    
+    // Fetch transactions specifically for this user
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
+      .eq('user_id', user.id)
       .order('date', { ascending: false });
     
     if (error) {
@@ -23,7 +32,8 @@ export const fetchTransactions = async () => {
       asset: item.asset,
       amount: Number(item.amount),
       value: Number(item.value),
-      status: item.status as 'completed' | 'pending' | 'failed'
+      status: item.status as 'completed' | 'pending' | 'failed',
+      toAsset: item.to_asset
     }));
     
     return formattedTransactions;
@@ -51,7 +61,8 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
         amount: transaction.amount,
         value: transaction.value,
         status: transaction.status,
-        user_id: user.id // Add the user_id to the transaction record
+        user_id: user.id, // Add the user_id to the transaction record
+        to_asset: transaction.toAsset // Include the destination asset for swap transactions
       });
       
     if (error) {

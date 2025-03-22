@@ -84,10 +84,13 @@ export const useTransactions = () => {
       }
     ];
     
-    setTransactions(prev => [...initialTransactions, ...prev.filter(tx => 
-      // Filter out any transaction with the same ID as our initial transactions
-      !initialTransactions.some(init => init.id === tx.id)
-    )]);
+    // Only apply initial transactions when no transactions exist yet
+    setTransactions(prev => {
+      if (prev.length === 0) {
+        return initialTransactions;
+      }
+      return prev;
+    });
   }, []);
 
   // Fetch transactions from Supabase on component mount
@@ -96,12 +99,26 @@ export const useTransactions = () => {
       try {
         setIsLoading(true);
         const data = await fetchTransactions();
-        // Merge with our initial transactions
+        
+        // Ensure we have a clean merge of remote and local transactions
         setTransactions(prev => {
-          // Combine existing local transactions with fetched ones
-          const localTxIds = prev.map(tx => tx.id);
-          const uniqueRemoteTxs = data.filter(tx => !localTxIds.includes(tx.id));
-          return [...prev, ...uniqueRemoteTxs];
+          // Get all transaction IDs to avoid duplicates
+          const existingIds = new Set([...prev.map(tx => tx.id), ...data.map(tx => tx.id)]);
+          
+          // Combine all transactions, prioritizing remote data
+          const allTransactions = [...data];
+          
+          // Only add local transactions that don't exist in the remote data
+          prev.forEach(localTx => {
+            if (!data.some(remoteTx => remoteTx.id === localTx.id)) {
+              allTransactions.push(localTx);
+            }
+          });
+          
+          // Sort by date (newest first)
+          return allTransactions.sort((a, b) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
         });
       } catch (error) {
         console.error('Error loading transactions:', error);

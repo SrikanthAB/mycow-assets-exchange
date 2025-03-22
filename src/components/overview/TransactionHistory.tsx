@@ -1,7 +1,7 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { usePortfolio } from "@/contexts/portfolio";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,6 +51,12 @@ const TransactionHistory = () => {
         return `${transaction.asset} locked as collateral`;
       case 'unlock':
         return `${transaction.asset} unlocked from collateral`;
+      case 'stake':
+        return `${transaction.asset} staked`;
+      case 'unstake':
+        return `${transaction.asset} unstaked`;
+      case 'swap':
+        return `Swapped ${transaction.asset} for ${transaction.toAsset}`;
       default:
         return transaction.asset ? transaction.asset : 'Transaction';
     }
@@ -70,14 +76,16 @@ const TransactionHistory = () => {
             A record of all your transactions
           </CardDescription>
         </div>
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-2"
-          onClick={downloadStatement}
-        >
-          <Download size={16} />
-          Download Statement
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={downloadStatement}
+          >
+            <Download size={16} />
+            Download
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
