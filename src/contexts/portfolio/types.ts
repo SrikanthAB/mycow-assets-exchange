@@ -1,4 +1,3 @@
-
 // Define token types
 export interface Token {
   id: string;
@@ -14,6 +13,7 @@ export interface Token {
   locked?: boolean;
   lockedAmount?: number;
   loanId?: string;
+  staked?: boolean; // Added the staked property
 }
 
 // Define transaction interface

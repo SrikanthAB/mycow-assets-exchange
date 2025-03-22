@@ -2,7 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
 
-const StakingHeader = () => {
+interface StakingHeaderProps {
+  onStake: () => void;
+}
+
+const StakingHeader = ({ onStake }: StakingHeaderProps) => {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10">
       <div>
@@ -13,7 +17,7 @@ const StakingHeader = () => {
       </div>
       
       <div className="mt-4 md:mt-0">
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="outline" className="flex items-center gap-2" onClick={onStake}>
           <Info size={16} />
           Learn About Yields
         </Button>

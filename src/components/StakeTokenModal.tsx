@@ -7,21 +7,14 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { ArrowRight } from "lucide-react";
+import { Token } from "@/contexts/portfolio/types";
 
 interface StakeTokenModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  token: {
-    id: string;
-    name: string;
-    symbol: string;
-    category: string;
-    price: number;
-    priceString: string;
-    balance: number;
-    yield?: string;
-  };
-  strategy: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  tokens: Token[];
+  initialToken: Token | null;
+  strategy?: {
     id: string;
     name: string;
     description: string;
@@ -31,19 +24,21 @@ interface StakeTokenModalProps {
   };
 }
 
-const StakeTokenModal = ({ isOpen, onClose, token, strategy }: StakeTokenModalProps) => {
-  const [amount, setAmount] = useState<number>(token.balance);
+const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }: StakeTokenModalProps) => {
+  const [selectedToken, setSelectedToken] = useState<Token | null>(initialToken);
+  const [amount, setAmount] = useState<number>(initialToken?.balance || 0);
   const [autoCompound, setAutoCompound] = useState<boolean>(true);
   const [yieldRedirect, setYieldRedirect] = useState<boolean>(true);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const { toast } = useToast();
   
-  const currentYield = token.yield ? parseFloat(token.yield.replace(/[^0-9.]/g, '')) : 0;
+  const token = selectedToken || initialToken || tokens[0];
+  const currentYield = token?.yield ? parseFloat(token.yield.replace(/[^0-9.]/g, '')) : 0;
   const strategyYield = strategy ? parseFloat(strategy.expectedReturn.split('-')[1]) : 0;
   const compoundBenefit = yieldRedirect ? (strategyYield - currentYield) : 0;
   
   const handleStake = () => {
-    if (!amount || amount <= 0 || amount > token.balance) return;
+    if (!token || !amount || amount <= 0 || amount > token.balance) return;
     
     setIsProcessing(true);
     
@@ -51,16 +46,18 @@ const StakeTokenModal = ({ isOpen, onClose, token, strategy }: StakeTokenModalPr
     setTimeout(() => {
       toast({
         title: "Tokens Staked Successfully",
-        description: `You have staked ${amount} ${token.symbol} tokens with ${autoCompound ? 'auto-compounding' : 'manual'} ${yieldRedirect ? `and yield redirected to ${strategy.name} strategy` : ''}`,
+        description: `You have staked ${amount} ${token.symbol} tokens with ${autoCompound ? 'auto-compounding' : 'manual'} ${yieldRedirect && strategy ? `and yield redirected to ${strategy.name} strategy` : ''}`,
       });
       
       setIsProcessing(false);
-      onClose();
+      onOpenChange(false);
     }, 1500);
   };
   
+  if (!token) return null;
+  
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Stake {token.name}</DialogTitle>
@@ -120,20 +117,22 @@ const StakeTokenModal = ({ isOpen, onClose, token, strategy }: StakeTokenModalPr
               />
             </div>
             
-            <div className="flex items-center justify-between space-x-2">
-              <Label htmlFor="yield-redirect" className="flex flex-col">
-                <span>Redirect Yield to {strategy.name} Strategy</span>
-                <span className="font-normal text-xs text-muted-foreground">Invest yield into {strategy.name.toLowerCase()} risk assets</span>
-              </Label>
-              <Switch
-                id="yield-redirect"
-                checked={yieldRedirect}
-                onCheckedChange={setYieldRedirect}
-              />
-            </div>
+            {strategy && (
+              <div className="flex items-center justify-between space-x-2">
+                <Label htmlFor="yield-redirect" className="flex flex-col">
+                  <span>Redirect Yield to {strategy.name} Strategy</span>
+                  <span className="font-normal text-xs text-muted-foreground">Invest yield into {strategy.name.toLowerCase()} risk assets</span>
+                </Label>
+                <Switch
+                  id="yield-redirect"
+                  checked={yieldRedirect}
+                  onCheckedChange={setYieldRedirect}
+                />
+              </div>
+            )}
           </div>
           
-          {yieldRedirect && (
+          {yieldRedirect && strategy && (
             <div className="bg-primary/5 p-3 rounded-md border border-primary/20">
               <h4 className="text-sm font-medium flex items-center">
                 <span>Current Yield</span>
@@ -152,7 +151,7 @@ const StakeTokenModal = ({ isOpen, onClose, token, strategy }: StakeTokenModalPr
         </div>
         
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={isProcessing}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isProcessing}>
             Cancel
           </Button>
           <Button 

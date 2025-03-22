@@ -1,8 +1,13 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePortfolio } from "@/contexts/portfolio";
+import { Token } from "@/contexts/portfolio";
 
-const StakingStats = () => {
+interface StakingStatsProps {
+  stakedTokens: Token[];
+}
+
+const StakingStats = ({ stakedTokens }: StakingStatsProps) => {
   const { tokens, getTotalPortfolioValue } = usePortfolio();
   
   return (
