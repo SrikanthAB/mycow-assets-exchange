@@ -36,7 +36,7 @@ const StakedAssetsTab = ({ stakedTokens, onManageToken }: StakedAssetsTabProps) 
     return Object.entries(categoryAllocations)
       .map(([category, value]) => ({
         category,
-        percentage: Math.round((value / totalValue) * 100)
+        percentage: totalValue > 0 ? Math.round((value / totalValue) * 100) : 0
       }))
       .sort((a, b) => b.percentage - a.percentage)
       .slice(0, 3); // Limit to top 3 categories
