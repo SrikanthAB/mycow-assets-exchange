@@ -1,19 +1,31 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Token } from "@/contexts/portfolio/types";
 import { TrendingUp, TrendingDown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import SellAssetModal from "./SellAssetModal";
 
 interface AssetCardProps {
   token: Token;
 }
 
 const AssetCard = ({ token }: AssetCardProps) => {
+  const [sellModalOpen, setSellModalOpen] = useState(false);
+  
   const isPositiveChange = token.change >= 0;
   const tokenValue = token.price * token.balance;
   const availableBalance = token.locked && token.lockedAmount ? token.balance - token.lockedAmount : token.balance;
   const availableValue = token.price * availableBalance;
+  
+  const openSellModal = () => {
+    setSellModalOpen(true);
+  };
+  
+  const closeSellModal = () => {
+    setSellModalOpen(false);
+  };
   
   return (
     <div className="bg-background rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
@@ -93,6 +105,24 @@ const AssetCard = ({ token }: AssetCardProps) => {
           </div>
         )}
       </div>
+      
+      <div className="mt-4 pt-4 border-t border-border">
+        <Button 
+          className="w-full"
+          onClick={openSellModal}
+          disabled={token.locked && availableBalance <= 0}
+          variant={token.locked && availableBalance <= 0 ? "outline" : "default"}
+        >
+          {token.locked && availableBalance <= 0 ? "Locked" : "Sell Asset"}
+        </Button>
+      </div>
+      
+      {/* Sell Asset Modal */}
+      <SellAssetModal 
+        isOpen={sellModalOpen} 
+        onClose={closeSellModal} 
+        token={token} 
+      />
     </div>
   );
 };
