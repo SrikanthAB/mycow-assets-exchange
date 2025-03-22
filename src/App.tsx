@@ -1,9 +1,12 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "./components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster"
+
+// Import layouts
+import HomeLayout from './layouts/HomeLayout';
+import MainLayout from './layouts/MainLayout';
 
 // Import pages
 import Index from './pages/Index';
@@ -35,10 +38,15 @@ function App() {
         <ThemeProvider defaultTheme="system" storageKey="mycow-theme-preference">
           <AuthProvider>
             <PortfolioProvider>
-              <div className="App min-h-screen flex flex-col">
-                <Routes>
-                  {/* Public Routes */}
+              <Routes>
+                {/* Home route with Footer */}
+                <Route element={<HomeLayout />}>
                   <Route path="/" element={<Index />} />
+                </Route>
+                
+                {/* Other routes without Footer */}
+                <Route element={<MainLayout />}>
+                  {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/markets" element={<Markets />} />
@@ -54,8 +62,8 @@ function App() {
                   
                   {/* 404 Route */}
                   <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
+                </Route>
+              </Routes>
               <Toaster />
             </PortfolioProvider>
           </AuthProvider>

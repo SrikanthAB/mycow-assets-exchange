@@ -1,8 +1,10 @@
 
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate();
   
   // Organize footer links, marking existing routes that are already implemented
   const footerSections = [
@@ -61,7 +63,9 @@ const Footer = () => {
     } else if (link.isExternal && link.url) {
       // External links open in a new tab, no need to prevent default
     } else {
-      // For internal links that are not "coming soon", scroll to top of page
+      // For internal links, navigate programmatically and scroll to top
+      e.preventDefault();
+      navigate(link.path);
       window.scrollTo(0, 0);
     }
   };

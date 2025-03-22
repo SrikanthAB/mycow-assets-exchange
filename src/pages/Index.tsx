@@ -1,10 +1,7 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import MarketSection from "@/components/MarketSection";
-import Footer from "@/components/Footer";
 import { ArrowRight, BarChart2, Shield, RefreshCw, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -71,8 +68,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
-      
       <main>
         <Hero />
         
@@ -181,8 +176,6 @@ const Index = () => {
           </section>
         )}
       </main>
-      
-      <Footer />
     </div>
   );
 };
