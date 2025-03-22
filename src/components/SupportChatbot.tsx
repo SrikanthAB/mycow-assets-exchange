@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Bot, User, Phone } from 'lucide-react';
+import { Send, Bot, User, Phone, Loader2 } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 type Message = {
   sender: 'user' | 'bot';
@@ -35,9 +37,22 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [showConnectAgent, setShowConnectAgent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  useEffect(() => {
+    // Scroll to the bottom when messages change
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [messages]);
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
 
     // Add user message
     const userMessage: Message = {
@@ -48,20 +63,57 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
     
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
+    setIsLoading(true);
 
-    // Show connect agent button after user sends their first message
-    setTimeout(() => {
-      setShowConnectAgent(true);
-      
-      // Simulate bot response
+    try {
+      // Show connect agent button after user sends their first message
+      if (!showConnectAgent) {
+        setShowConnectAgent(true);
+      }
+
+      // Call the AI support edge function
+      const { data, error } = await supabase.functions.invoke('ai-support', {
+        body: { 
+          message: userMessage.text,
+          chatHistory: messages.map(msg => ({
+            sender: msg.sender,
+            text: msg.text
+          }))
+        }
+      });
+
+      if (error) {
+        console.error('Error calling AI support:', error);
+        throw new Error(error.message || 'Failed to get a response');
+      }
+
+      // Add AI response
       const botResponse: Message = {
         sender: 'bot',
-        text: "Thanks for your query. I'll do my best to help! If you need more detailed assistance, you can connect with a live agent.",
+        text: data.reply || "I'm having trouble understanding that. Could you try rephrasing your question?",
         timestamp: new Date(),
       };
       
       setMessages((prev) => [...prev, botResponse]);
-    }, 1000);
+    } catch (error) {
+      console.error('Error in AI chat:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem getting a response. Please try again.",
+        variant: "destructive",
+      });
+      
+      // Add fallback bot response
+      const errorResponse: Message = {
+        sender: 'bot',
+        text: "I'm having some technical difficulties right now. Please try again or connect with a live agent for assistance.",
+        timestamp: new Date(),
+      };
+      
+      setMessages((prev) => [...prev, errorResponse]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -95,12 +147,12 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
             </Avatar>
             <div>
               <DialogTitle>MyCow Support</DialogTitle>
-              <DialogDescription className="text-xs">We're here to help</DialogDescription>
+              <DialogDescription className="text-xs">AI-powered assistance</DialogDescription>
             </div>
           </div>
         </DialogHeader>
         
-        <ScrollArea className="flex-1 p-4">
+        <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
           <div className="space-y-4">
             {messages.map((message, index) => (
               <div 
@@ -121,7 +173,7 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
                     </Avatar>
                   )}
                   <div>
-                    <div className="text-sm">{message.text}</div>
+                    <div className="text-sm whitespace-pre-wrap">{message.text}</div>
                     <div className="text-[10px] mt-1 opacity-70 text-right">
                       {formatTime(message.timestamp)}
                     </div>
@@ -134,6 +186,17 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="flex items-center bg-muted rounded-lg px-3 py-2">
+                  <Avatar className="h-6 w-6 mr-2">
+                    <AvatarImage src="/lovable-uploads/2357ba2d-c9c0-46f4-8848-6384dd15da4b.png" />
+                    <AvatarFallback><Bot className="h-3 w-3" /></AvatarFallback>
+                  </Avatar>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
+              </div>
+            )}
           </div>
         </ScrollArea>
         
@@ -158,9 +221,14 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1"
+            disabled={isLoading}
           />
-          <Button size="icon" onClick={handleSendMessage}>
-            <Send className="h-4 w-4" />
+          <Button size="icon" onClick={handleSendMessage} disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </DialogContent>
