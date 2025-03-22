@@ -32,6 +32,30 @@ const TransactionHistory = () => {
     });
   };
 
+  // Function to get transaction description based on transaction type
+  const getTransactionDescription = (transaction) => {
+    switch (transaction.type) {
+      case 'buy':
+        return `Bought ${transaction.asset}`;
+      case 'sell':
+        return `Sold ${transaction.asset}`;
+      case 'deposit':
+        return 'Funds deposited';
+      case 'withdrawal':
+        return 'Funds withdrawn';
+      case 'loan':
+        return `Loan secured with ${transaction.asset}`;
+      case 'repayment':
+        return `Loan repaid for ${transaction.asset}`;
+      case 'lock':
+        return `${transaction.asset} locked as collateral`;
+      case 'unlock':
+        return `${transaction.asset} unlocked from collateral`;
+      default:
+        return transaction.asset ? transaction.asset : 'Transaction';
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -79,8 +103,7 @@ const TransactionHistory = () => {
                   </TableCell>
                   <TableCell className="capitalize">{transaction.type}</TableCell>
                   <TableCell>
-                    {transaction.asset ? transaction.asset : 
-                      transaction.type === 'deposit' ? 'Added funds' : 'Withdrawn funds'}
+                    {getTransactionDescription(transaction)}
                   </TableCell>
                   <TableCell className="text-right font-medium">
                     ₹{transaction.value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}

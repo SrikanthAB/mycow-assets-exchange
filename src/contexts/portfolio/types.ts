@@ -20,7 +20,7 @@ export interface Token {
 export interface Transaction {
   id: string;
   date: string;
-  type: 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock';
+  type: 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock' | 'loan' | 'repayment';
   asset?: string;
   amount: number;
   value: number;

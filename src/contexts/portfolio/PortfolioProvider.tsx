@@ -39,6 +39,19 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
           : token
       )
     );
+    
+    // Add initial loan transaction for existing loan
+    const initialLoanTransaction: Transaction = {
+      id: "loan-tx-1",
+      date: "2023-12-15T10:00:00Z",
+      type: 'loan',
+      asset: "Digital Gold",
+      amount: 0.1,
+      value: 10000,
+      status: 'completed'
+    };
+    
+    setTransactions(prev => [initialLoanTransaction, ...prev]);
   }, []);
 
   // Fetch transactions from Supabase on component mount
@@ -47,7 +60,14 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
       try {
         setIsLoading(true);
         const data = await fetchTransactions();
-        setTransactions(data);
+        // Merge with our initial loan transaction
+        const mergedTransactions = [...data];
+        setTransactions(prev => {
+          // Combine existing local transactions with fetched ones
+          const localTxIds = prev.map(tx => tx.id);
+          const uniqueRemoteTxs = mergedTransactions.filter(tx => !localTxIds.includes(tx.id));
+          return [...prev, ...uniqueRemoteTxs];
+        });
       } catch (error) {
         console.error('Error loading transactions:', error);
       } finally {
@@ -168,7 +188,16 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
     // Add funds to wallet
     addFunds(loan.amount);
     
-    // Add transaction
+    // Add loan transaction
+    addTransaction({
+      type: 'loan',
+      asset: tokens.find(t => t.id === loan.collateralToken)?.name || loan.collateralToken,
+      amount: loan.collateralAmount,
+      value: loan.amount,
+      status: 'completed'
+    });
+    
+    // Add lock collateral transaction
     addTransaction({
       type: 'lock',
       asset: tokens.find(t => t.id === loan.collateralToken)?.name || loan.collateralToken,
@@ -202,7 +231,16 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
     if (lockedToken) {
       unlockToken(lockedToken.id);
       
-      // Add transaction
+      // Add repayment transaction
+      addTransaction({
+        type: 'repayment',
+        asset: lockedToken.name,
+        amount: loan.amount,
+        value: loan.amount,
+        status: 'completed'
+      });
+      
+      // Add unlock transaction
       addTransaction({
         type: 'unlock',
         asset: lockedToken.name,
