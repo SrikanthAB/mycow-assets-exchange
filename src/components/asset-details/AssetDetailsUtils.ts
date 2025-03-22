@@ -1,6 +1,17 @@
 
+import {
+  RealEstateDetailsType,
+  CommodityDetailsType,
+  EntertainmentDetailsType,
+  PrivateCreditDetailsType,
+  StablecoinDetailsType,
+  NativeTokenDetailsType,
+  DefaultDetailsType,
+  AssetDetailsType
+} from "./AssetDetailsContent";
+
 // This function generates mock details based on the asset category and name
-export const getAssetDetails = (asset: { category: string; name: string }) => {
+export const getAssetDetails = (asset: { category: string; name: string }): AssetDetailsType => {
   switch (asset.category) {
     case "Real Estate":
       return {
@@ -11,7 +22,7 @@ export const getAssetDetails = (asset: { category: string; name: string }) => {
         keyTenants: asset.name.includes("Embassy") ? "IBM, Microsoft, Google" : "HSBC, JP Morgan, TCS",
         yearBuilt: asset.name.includes("Embassy") ? "2012-2019" : "2015-2020",
         documentUrl: "#"
-      };
+      } as RealEstateDetailsType;
     case "Commodity":
       return {
         purity: asset.name.includes("Gold") ? "99.99% (24K)" : "99.95%",
@@ -21,7 +32,7 @@ export const getAssetDetails = (asset: { category: string; name: string }) => {
         audit: "Quarterly",
         insurance: "100% Insured",
         documentUrl: "#"
-      };
+      } as CommodityDetailsType;
     case "Entertainment":
       return {
         genre: asset.name.includes("Movie") ? "Bollywood Blockbusters" : "OTT Series",
@@ -30,7 +41,7 @@ export const getAssetDetails = (asset: { category: string; name: string }) => {
         term: "7 years",
         distribution: "International",
         documentUrl: "#"
-      };
+      } as EntertainmentDetailsType;
     case "Private Credit":
       return {
         borrowers: "Mid-sized Enterprises",
@@ -40,7 +51,7 @@ export const getAssetDetails = (asset: { category: string; name: string }) => {
         term: "12-36 months",
         diversification: "Across 15+ sectors",
         documentUrl: "#"
-      };
+      } as PrivateCreditDetailsType;
     case "Stablecoin":
       return {
         pegged: asset.name.includes("Gold") ? "Gold Price" : "Indian Rupee",
@@ -51,7 +62,7 @@ export const getAssetDetails = (asset: { category: string; name: string }) => {
         audit: "Monthly",
         regulation: "RBI Compliant",
         documentUrl: "#"
-      };
+      } as StablecoinDetailsType;
     case "Native Token":
       return {
         utility: "Platform Governance, Fee Discounts, Staking Rewards",
@@ -60,11 +71,11 @@ export const getAssetDetails = (asset: { category: string; name: string }) => {
         tokenomics: "Deflationary Model with Quarterly Burns",
         governance: "DAO Voting Rights",
         documentUrl: "#"
-      };
+      } as NativeTokenDetailsType;
     default:
       return {
         description: "Detailed information not available for this asset type.",
         documentUrl: "#"
-      };
+      } as DefaultDetailsType;
   }
 };

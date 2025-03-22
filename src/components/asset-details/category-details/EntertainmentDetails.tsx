@@ -2,15 +2,10 @@
 import React from "react";
 import { Tag, Building, Wallet } from "lucide-react";
 import DetailSection from "./DetailSection";
+import { EntertainmentDetailsType } from "../AssetDetailsContent";
 
 interface EntertainmentDetailsProps {
-  details: {
-    genre: string;
-    platforms: string;
-    distribution: string;
-    revenueStreams: string;
-    term: string;
-  };
+  details: EntertainmentDetailsType;
 }
 
 const EntertainmentDetails = ({ details }: EntertainmentDetailsProps) => {

@@ -2,16 +2,10 @@
 import React from "react";
 import { Tag, Wallet, Building } from "lucide-react";
 import DetailSection from "./DetailSection";
+import { PrivateCreditDetailsType } from "../AssetDetailsContent";
 
 interface PrivateCreditDetailsProps {
-  details: {
-    borrowers: string;
-    loanType: string;
-    interestRate: string;
-    collateral: string;
-    term: string;
-    diversification: string;
-  };
+  details: PrivateCreditDetailsType;
 }
 
 const PrivateCreditDetails = ({ details }: PrivateCreditDetailsProps) => {

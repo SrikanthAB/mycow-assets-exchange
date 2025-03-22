@@ -2,16 +2,10 @@
 import React from "react";
 import { Tag, Building, Wallet } from "lucide-react";
 import DetailSection from "./DetailSection";
+import { CommodityDetailsType } from "../AssetDetailsContent";
 
 interface CommodityDetailsProps {
-  details: {
-    purity: string;
-    storage: string;
-    custody: string;
-    insurance: string;
-    redemption: string;
-    audit: string;
-  };
+  details: CommodityDetailsType;
 }
 
 const CommodityDetails = ({ details }: CommodityDetailsProps) => {

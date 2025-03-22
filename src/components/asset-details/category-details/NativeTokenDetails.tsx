@@ -2,15 +2,10 @@
 import React from "react";
 import { Tag, Building, Wallet } from "lucide-react";
 import DetailSection from "./DetailSection";
+import { NativeTokenDetailsType } from "../AssetDetailsContent";
 
 interface NativeTokenDetailsProps {
-  details: {
-    utility: string;
-    circulation: string;
-    maxSupply: string;
-    tokenomics: string;
-    governance: string;
-  };
+  details: NativeTokenDetailsType;
 }
 
 const NativeTokenDetails = ({ details }: NativeTokenDetailsProps) => {

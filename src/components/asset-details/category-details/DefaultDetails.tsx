@@ -2,11 +2,10 @@
 import React from "react";
 import { FileText } from "lucide-react";
 import DetailSection from "./DetailSection";
+import { DefaultDetailsType } from "../AssetDetailsContent";
 
 interface DefaultDetailsProps {
-  details: {
-    description: string;
-  };
+  details: DefaultDetailsType;
 }
 
 const DefaultDetails = ({ details }: DefaultDetailsProps) => {

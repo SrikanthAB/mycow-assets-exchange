@@ -2,16 +2,10 @@
 import React from "react";
 import { MapPin, Building, Clock } from "lucide-react";
 import DetailSection from "./DetailSection";
+import { RealEstateDetailsType } from "../AssetDetailsContent";
 
 interface RealEstateDetailsProps {
-  details: {
-    location: string;
-    squareFootage: string;
-    occupancy: string;
-    yearBuilt: string;
-    leaseTerm: string;
-    keyTenants: string;
-  };
+  details: RealEstateDetailsType;
 }
 
 const RealEstateDetails = ({ details }: RealEstateDetailsProps) => {

@@ -2,17 +2,10 @@
 import React from "react";
 import { Tag, Building, Wallet } from "lucide-react";
 import DetailSection from "./DetailSection";
+import { StablecoinDetailsType } from "../AssetDetailsContent";
 
 interface StablecoinDetailsProps {
-  details: {
-    pegged: string;
-    backing: string;
-    custodian: string;
-    location: string;
-    audit: string;
-    regulation: string;
-    redemption: string;
-  };
+  details: StablecoinDetailsType;
 }
 
 const StablecoinDetails = ({ details }: StablecoinDetailsProps) => {
