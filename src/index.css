@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -6,45 +7,6 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-
-    --accent: 221 83% 53%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5% 26%;
-    --sidebar-primary: 240 6% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 5% 96%;
-    --sidebar-accent-foreground: 240 6% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217 91% 60%;
-  }
-
-  .dark {
     --background: 217 33% 17%;
     --foreground: 210 40% 98%;
 
@@ -55,7 +17,7 @@
     --popover-foreground: 210 40% 98%;
 
     --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
+    --primary-foreground: 210 40% 98%;
 
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -94,12 +56,12 @@
   }
 
   body {
-    @apply bg-background text-foreground min-h-screen;
+    @apply bg-[#0f172a] text-foreground min-h-screen;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-medium tracking-tight;
+    @apply font-medium tracking-tight text-white;
   }
   
   h1 {
@@ -127,17 +89,17 @@
   }
   
   p {
-    @apply text-base leading-7;
+    @apply text-base leading-7 text-gray-300;
   }
 }
 
 @layer components {
   .glass-effect {
-    @apply bg-black/30 backdrop-blur-md border border-white/10 shadow-glass;
+    @apply bg-[#0f172a]/90 backdrop-blur-md border border-blue-900/30 shadow-glass;
   }
   
   .glass-effect-dark {
-    @apply bg-mycow-950/80 backdrop-blur-md border border-mycow-800/30 shadow-glass;
+    @apply bg-[#0f172a]/80 backdrop-blur-md border border-blue-900/30 shadow-glass;
   }
   
   .asset-card {

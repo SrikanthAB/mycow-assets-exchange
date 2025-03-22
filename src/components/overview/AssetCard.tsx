@@ -28,21 +28,21 @@ const AssetCard = ({ token }: AssetCardProps) => {
   };
   
   return (
-    <div className="asset-card glass-effect group hover-elevate bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
+    <div className="asset-card bg-[#0f172a] text-white rounded-xl p-6 shadow-md hover:shadow-lg group hover-elevate transition-all duration-300">
       <div className="flex items-start justify-between">
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-[#1e3a8a] text-white flex items-center justify-center overflow-hidden">
             {token.image ? (
               <img src={token.image} alt={token.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-black flex items-center justify-center text-white font-medium">
+              <div className="w-full h-full flex items-center justify-center text-white font-medium">
                 {token.symbol.substring(0, 2)}
               </div>
             )}
           </div>
           <div className="ml-3">
             <div className="flex items-center">
-              <h4 className="font-medium">{token.name}</h4>
+              <h4 className="font-medium text-white">{token.name}</h4>
               {token.locked && (
                 <TooltipProvider>
                   <Tooltip>
@@ -56,16 +56,16 @@ const AssetCard = ({ token }: AssetCardProps) => {
                 </TooltipProvider>
               )}
             </div>
-            <div className="text-xs text-muted-foreground flex items-center">
-              <span className="bg-secondary px-1.5 py-0.5 rounded text-xs mr-2">{token.category}</span>
+            <div className="text-xs text-blue-300/80 flex items-center">
+              <span className="bg-blue-800/50 px-1.5 py-0.5 rounded text-xs mr-2">{token.category}</span>
               <span>{token.symbol}</span>
             </div>
           </div>
         </div>
         
         <div className="text-right">
-          <div className="text-sm font-medium">Balance</div>
-          <div>{token.balance.toLocaleString('en-IN', { maximumFractionDigits: 4 })} {token.symbol}</div>
+          <div className="text-sm text-gray-400">Balance</div>
+          <div className="text-white">{token.balance.toLocaleString('en-IN', { maximumFractionDigits: 4 })} {token.symbol}</div>
           {token.locked && (
             <div className="text-xs text-amber-500">
               ({availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 4 })} available)
@@ -74,10 +74,10 @@ const AssetCard = ({ token }: AssetCardProps) => {
         </div>
       </div>
       
-      <div className="mt-4 flex items-end justify-between border-t border-border pt-4">
+      <div className="mt-4 flex items-end justify-between border-t border-blue-900/50 pt-4">
         <div>
-          <div className="text-sm text-muted-foreground">Current Value</div>
-          <div className="text-xl font-semibold">₹{tokenValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+          <div className="text-sm text-gray-400">Current Value</div>
+          <div className="text-xl font-semibold text-white">₹{tokenValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
           {token.locked && (
             <div className="text-xs text-amber-500">
               (₹{availableValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })} available)
@@ -86,7 +86,7 @@ const AssetCard = ({ token }: AssetCardProps) => {
           <div 
             className={cn(
               "flex items-center text-sm",
-              isPositiveChange ? "text-green-600" : "text-red-500"
+              isPositiveChange ? "text-green-500" : "text-red-500"
             )}
           >
             {isPositiveChange ? (
@@ -100,15 +100,15 @@ const AssetCard = ({ token }: AssetCardProps) => {
         
         {token.yield && (
           <div className="text-right">
-            <div className="text-sm text-muted-foreground">Estimated Yield</div>
-            <div className="font-medium text-green-600">{token.yield}</div>
+            <div className="text-sm text-gray-400">Estimated Yield</div>
+            <div className="font-medium text-green-500">{token.yield}</div>
           </div>
         )}
       </div>
       
-      <div className="mt-4 pt-4 border-t border-border">
+      <div className="mt-4 pt-4 border-t border-blue-900/50">
         <Button 
-          className="w-full"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white"
           onClick={openSellModal}
           disabled={token.locked && availableBalance <= 0}
           variant={token.locked && availableBalance <= 0 ? "outline" : "default"}
