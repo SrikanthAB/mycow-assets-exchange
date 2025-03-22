@@ -1,5 +1,5 @@
 
-import { Coin } from "lucide-react";
+import { Coins } from "lucide-react";
 import { Token } from "@/contexts/portfolio";
 import { 
   Select,
@@ -39,7 +39,7 @@ const TokenSelector = ({
         value={selectedToken?.id || ""}
         onValueChange={onChange}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full bg-secondary/80 border-secondary-foreground/10">
           <SelectValue placeholder="Select token">
             {selectedToken && (
               <div className="flex items-center gap-2">
@@ -50,19 +50,19 @@ const TokenSelector = ({
                     className="w-5 h-5 rounded-full"
                   />
                 ) : (
-                  <Coin className="w-5 h-5 text-muted-foreground" />
+                  <Coins className="w-5 h-5 text-primary" />
                 )}
                 <span>{selectedToken.symbol}</span>
               </div>
             )}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-card border-primary/10 shadow-lg">
           {tokens.map(token => (
             <SelectItem 
               key={token.id} 
               value={token.id}
-              className="flex items-center gap-2 py-3"
+              className="flex items-center gap-2 py-3 hover:bg-secondary/50 focus:bg-secondary/50"
             >
               <div className="flex items-center gap-2">
                 {token.image ? (
@@ -72,7 +72,7 @@ const TokenSelector = ({
                     className="w-5 h-5 rounded-full"
                   />
                 ) : (
-                  <Coin className="w-5 h-5 text-muted-foreground" />
+                  <Coins className="w-5 h-5 text-primary" />
                 )}
                 <div className="flex flex-col">
                   <span className="font-medium">{token.symbol}</span>

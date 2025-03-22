@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Sparkle } from "lucide-react";
 import { Token } from "@/contexts/portfolio";
 
 interface SwapButtonProps {
@@ -22,7 +22,7 @@ const SwapButton = ({
 
   return (
     <Button 
-      className="w-full" 
+      className="w-full shadow-md bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all duration-300" 
       disabled={!fromToken || !toToken || fromAmount <= 0 || insufficientBalance || isSwapping}
       onClick={onClick}
     >
@@ -34,7 +34,10 @@ const SwapButton = ({
       ) : insufficientBalance ? (
         "Insufficient Balance"
       ) : (
-        "Swap Tokens"
+        <>
+          <Sparkle className="h-4 w-4 mr-1" />
+          Swap Tokens
+        </>
       )}
     </Button>
   );

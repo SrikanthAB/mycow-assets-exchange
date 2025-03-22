@@ -23,8 +23,16 @@ const SwapInputField = ({
   placeholder = "0.0"
 }: SwapInputFieldProps) => {
   return (
-    <div className="mt-2 mb-4">
-      <div className="flex gap-2">
+    <div className="mt-2 mb-4 bg-secondary/20 p-4 rounded-xl border border-secondary/30">
+      <TokenSelector
+        tokens={tokens}
+        selectedToken={token}
+        onChange={onTokenChange}
+        label="Select Token"
+        balance={true}
+      />
+      
+      <div className="mt-3">
         <Input
           type="number"
           value={amount || ""}
@@ -32,21 +40,9 @@ const SwapInputField = ({
           placeholder={placeholder}
           min="0"
           step="0.01"
-          className={`flex-1 ${readOnly ? "bg-muted/30" : ""}`}
+          className={`w-full bg-background/60 backdrop-blur-sm border-secondary/20 focus:border-primary/40 ${readOnly ? "bg-muted/30" : ""}`}
           readOnly={readOnly}
         />
-        
-        <select 
-          className="bg-muted rounded-md px-3 py-2 text-sm w-24"
-          value={token?.id || ""}
-          onChange={(e) => onTokenChange(e.target.value)}
-        >
-          {tokens.map(token => (
-            <option key={token.id} value={token.id}>
-              {token.symbol}
-            </option>
-          ))}
-        </select>
       </div>
     </div>
   );

@@ -16,6 +16,13 @@ export function ThemeProvider({
   children, 
   ...props 
 }: ThemeProviderProps) {
+  // Set default theme to dark
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("mycow-theme-preference") || "dark"
+    document.documentElement.classList.add(savedTheme)
+    localStorage.setItem("mycow-theme-preference", savedTheme)
+  }, [])
+  
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>
 }
 
@@ -35,7 +42,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="inline-flex items-center justify-center rounded-md p-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="inline-flex items-center justify-center rounded-md p-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
       {theme === "light" ? (
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-moon">
@@ -63,16 +70,19 @@ export const useTheme = () => {
   const context = useContext(ThemeContext)
   if (context === undefined) {
     // Use a default implementation if outside provider
-    const [theme, setThemeState] = useState<string>("")
+    const [theme, setThemeState] = useState<string>("dark")
     
     useEffect(() => {
       // Check for system preference or stored preference
-      const savedTheme = localStorage.getItem("mycow-theme-preference")
-      if (savedTheme) {
-        setThemeState(savedTheme)
+      const savedTheme = localStorage.getItem("mycow-theme-preference") || "dark"
+      setThemeState(savedTheme)
+      
+      if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark")
+        document.documentElement.classList.remove("light")
       } else {
-        const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-        setThemeState(isDark ? "dark" : "light")
+        document.documentElement.classList.add("light")
+        document.documentElement.classList.remove("dark")
       }
     }, [])
     
@@ -81,7 +91,9 @@ export const useTheme = () => {
       localStorage.setItem("mycow-theme-preference", newTheme)
       if (newTheme === "dark") {
         document.documentElement.classList.add("dark")
+        document.documentElement.classList.remove("light")
       } else {
+        document.documentElement.classList.add("light")
         document.documentElement.classList.remove("dark")
       }
     }
