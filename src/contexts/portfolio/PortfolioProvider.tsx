@@ -21,7 +21,8 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
     getTotalPortfolioValue, 
     getAvailablePortfolioValue,
     loadTokensFromStorage,
-    saveTokensToStorage
+    saveTokensToStorage,
+    toggleTokenStaking
   } = useTokens();
   
   const { 
@@ -126,7 +127,8 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
       addTransaction: enhancedAddTransaction,
       addLoan,
       repayLoan,
-      isLoading
+      isLoading,
+      toggleTokenStaking
     }}>
       {children}
     </PortfolioContext.Provider>

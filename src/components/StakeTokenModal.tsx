@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { ArrowRight } from "lucide-react";
 import { Token } from "@/contexts/portfolio/types";
+import { usePortfolio } from "@/contexts/portfolio/usePortfolio";
 
 interface StakeTokenModalProps {
   open: boolean;
@@ -31,27 +32,51 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
   const [yieldRedirect, setYieldRedirect] = useState<boolean>(true);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const { toast } = useToast();
+  const { toggleTokenStaking, addTransaction } = usePortfolio();
   
   const token = selectedToken || initialToken || tokens[0];
   const currentYield = token?.yield ? parseFloat(token.yield.replace(/[^0-9.]/g, '')) : 0;
   const strategyYield = strategy ? parseFloat(strategy.expectedReturn.split('-')[1]) : 0;
   const compoundBenefit = yieldRedirect ? (strategyYield - currentYield) : 0;
   
-  const handleStake = () => {
+  const handleStake = async () => {
     if (!token || !amount || amount <= 0 || amount > token.balance) return;
     
     setIsProcessing(true);
     
-    // Simulate staking process
-    setTimeout(() => {
+    try {
+      // Calculate yield rate based on strategy
+      const yieldRate = yieldRedirect && strategy 
+        ? `${strategyYield}% APY`
+        : `${currentYield || 5}% APY`;
+      
+      // Toggle token staking status
+      toggleTokenStaking(token.id, true, yieldRate);
+      
+      // Add transaction record
+      await addTransaction({
+        type: 'stake',
+        asset: token.id,
+        amount: amount,
+        value: token.price * amount,
+        status: 'completed',
+      });
+      
       toast({
         title: "Tokens Staked Successfully",
         description: `You have staked ${amount} ${token.symbol} tokens with ${autoCompound ? 'auto-compounding' : 'manual'} ${yieldRedirect && strategy ? `and yield redirected to ${strategy.name} strategy` : ''}`,
       });
-      
+    } catch (error) {
+      console.error("Error staking tokens:", error);
+      toast({
+        title: "Error Staking Tokens",
+        description: "There was an error staking your tokens. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsProcessing(false);
       onOpenChange(false);
-    }, 1500);
+    }
   };
   
   if (!token) return null;

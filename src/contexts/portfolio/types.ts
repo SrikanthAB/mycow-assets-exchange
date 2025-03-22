@@ -1,3 +1,4 @@
+
 // Define token types
 export interface Token {
   id: string;
@@ -13,18 +14,19 @@ export interface Token {
   locked?: boolean;
   lockedAmount?: number;
   loanId?: string;
-  staked?: boolean; // Added the staked property
+  staked?: boolean;
 }
 
 // Define transaction interface
 export interface Transaction {
   id: string;
   date: string;
-  type: 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock' | 'loan' | 'repayment';
+  type: 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock' | 'loan' | 'repayment' | 'stake' | 'unstake' | 'swap';
   asset?: string;
   amount: number;
   value: number;
   status: 'completed' | 'pending' | 'failed';
+  toAsset?: string; // For swap transactions
 }
 
 // Define loan interface
@@ -60,4 +62,5 @@ export interface PortfolioContextType {
   addLoan: (loan: Omit<Loan, 'id'>) => void;
   repayLoan: (id: string) => void;
   isLoading: boolean;
+  toggleTokenStaking: (id: string, isStaked: boolean, yieldRate?: string) => void;
 }

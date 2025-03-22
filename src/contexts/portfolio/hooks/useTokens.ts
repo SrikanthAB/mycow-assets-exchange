@@ -175,6 +175,21 @@ export const useTokens = () => {
     }, 0);
   };
 
+  // New function to toggle staking status
+  const toggleTokenStaking = (id: string, isStaked: boolean, yieldRate?: string) => {
+    setTokens(prev => 
+      prev.map(token => 
+        token.id === id 
+          ? { 
+              ...token, 
+              staked: isStaked,
+              yield: isStaked ? (yieldRate || token.yield || "5% APY") : undefined
+            } 
+          : token
+      )
+    );
+  };
+
   return {
     tokens,
     setTokens,
@@ -187,6 +202,7 @@ export const useTokens = () => {
     getTotalPortfolioValue,
     getAvailablePortfolioValue,
     loadTokensFromStorage,
-    saveTokensToStorage
+    saveTokensToStorage,
+    toggleTokenStaking
   };
 };

@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Token } from "@/contexts/portfolio";
+import { Token, usePortfolio } from "@/contexts/portfolio";
 import { useTheme } from "@/components/ui/theme-provider";
 import { ArrowUpRight, Sparkle, Info } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface StakedTokensCardProps {
   stakedTokens: Token[];
@@ -14,7 +15,37 @@ interface StakedTokensCardProps {
 
 const StakedTokensCard = ({ stakedTokens, onManageToken }: StakedTokensCardProps) => {
   const { theme } = useTheme();
+  const { toggleTokenStaking, addTransaction } = usePortfolio();
+  const { toast } = useToast();
   const isDark = theme === 'dark';
+  
+  const handleUnstake = async (token: Token) => {
+    try {
+      // Unstake the token
+      toggleTokenStaking(token.id, false);
+      
+      // Add transaction record for unstaking
+      await addTransaction({
+        type: 'unstake',
+        asset: token.id,
+        amount: token.balance,
+        value: token.price * token.balance,
+        status: 'completed'
+      });
+      
+      toast({
+        title: "Tokens Unstaked Successfully",
+        description: `You have unstaked ${token.balance} ${token.symbol} tokens.`
+      });
+    } catch (error) {
+      console.error("Error unstaking tokens:", error);
+      toast({
+        title: "Error Unstaking Tokens",
+        description: "There was an error unstaking your tokens. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
   
   return (
     <Card className={isDark ? "bg-[#0f172a] border-blue-900/50 text-white" : "border-primary/20"}>
@@ -73,19 +104,30 @@ const StakedTokensCard = ({ stakedTokens, onManageToken }: StakedTokensCardProps
                   </div>
                 </div>
                 
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className={
-                    isDark 
-                      ? "border-blue-500/50 text-blue-300 hover:bg-blue-900/30" 
-                      : "border-primary/50 text-primary hover:bg-primary/10"
-                  }
-                  onClick={() => onManageToken(token)}
-                >
-                  <Info size={14} className="mr-1" />
-                  Manage
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className={
+                      isDark 
+                        ? "border-blue-500/50 text-blue-300 hover:bg-blue-900/30" 
+                        : "border-primary/50 text-primary hover:bg-primary/10"
+                    }
+                    onClick={() => onManageToken(token)}
+                  >
+                    <Info size={14} className="mr-1" />
+                    Manage
+                  </Button>
+                  
+                  <Button 
+                    size="sm" 
+                    variant="destructive" 
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={() => handleUnstake(token)}
+                  >
+                    Unstake
+                  </Button>
+                </div>
               </div>
             ))}
             

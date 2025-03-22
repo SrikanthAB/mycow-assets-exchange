@@ -1,145 +1,170 @@
 
 import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
 import { Token, usePortfolio } from "@/contexts/portfolio";
+import { useToast } from "@/components/ui/use-toast";
 
 export const useSwapForm = (tokens: Token[]) => {
-  const { updateTokenBalance, addTransaction } = usePortfolio();
   const [fromToken, setFromToken] = useState<Token | null>(null);
   const [toToken, setToToken] = useState<Token | null>(null);
   const [fromAmount, setFromAmount] = useState<number>(0);
-  const [toAmount, setToAmount] = useState<number>(0);
-  const [exchangeRate, setExchangeRate] = useState<number>(0);
-  const [isSwapping, setIsSwapping] = useState(false);
+  const [toAmount, setToAmount] = useState<number | null>(null);
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [isSwapping, setIsSwapping] = useState<boolean>(false);
+
+  const { updateTokenBalance, addToken, addTransaction } = usePortfolio();
   const { toast } = useToast();
-  
-  // Initialize tokens when they are available
+
+  // Set initial tokens if available
   useEffect(() => {
-    if (tokens.length >= 2) {
-      setFromToken(tokens[0]);
-      setToToken(tokens[1]);
+    if (tokens.length > 0) {
+      if (!fromToken) setFromToken(tokens[0]);
+      if (!toToken && tokens.length > 1) setToToken(tokens[1]);
     }
   }, [tokens]);
-  
-  // Calculate exchange rate when tokens or amounts change
+
+  // Calculate exchange rate and to amount when dependencies change
   useEffect(() => {
     if (fromToken && toToken) {
       calculateExchangeRate();
     }
   }, [fromToken, toToken, fromAmount]);
-  
+
   const calculateExchangeRate = () => {
     if (!fromToken || !toToken) return;
-    
-    // Calculate exchange rate with a small random variation
+
+    // Add small random variation to simulate market fluctuations
     const baseRate = fromToken.price / toToken.price;
-    const variation = 0.98 + Math.random() * 0.04; // Random between 0.98 and 1.02
-    const rate = baseRate * variation;
+    const variation = 0.01 * (Math.random() * 2 - 1); // Random variation between -1% and +1%
+    const rate = baseRate * (1 + variation);
+    
     setExchangeRate(rate);
     
-    // Update to amount based on from amount and rate
     if (fromAmount > 0) {
-      setToAmount(fromAmount * rate);
-    }
-  };
-  
-  const handleFromTokenChange = (tokenId: string) => {
-    const selected = tokens.find(t => t.id === tokenId) || null;
-    setFromToken(selected);
-    
-    // Don't allow same token to be selected for both fields
-    if (selected && toToken && selected.id === toToken.id) {
-      const nextToken = tokens.find(t => t.id !== selected.id) || null;
-      setToToken(nextToken);
-    }
-  };
-  
-  const handleToTokenChange = (tokenId: string) => {
-    const selected = tokens.find(t => t.id === tokenId) || null;
-    setToToken(selected);
-    
-    // Don't allow same token to be selected for both fields
-    if (selected && fromToken && selected.id === fromToken.id) {
-      const nextToken = tokens.find(t => t.id !== selected.id) || null;
-      setFromToken(nextToken);
-    }
-  };
-  
-  const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
-    setFromAmount(value);
-    if (exchangeRate && value > 0) {
-      setToAmount(value * exchangeRate);
+      // Apply a 0.5% swap fee
+      const swapFee = 0.005;
+      const calculatedAmount = (fromAmount * rate) * (1 - swapFee);
+      setToAmount(calculatedAmount);
     } else {
       setToAmount(0);
     }
   };
-  
-  const handleSwap = () => {
-    if (!fromToken || !toToken || fromAmount <= 0) return;
+
+  const handleFromTokenChange = (token: Token) => {
+    if (token.id === toToken?.id) {
+      // If same as to token, swap them
+      setFromToken(toToken);
+      setToToken(fromToken);
+    } else {
+      setFromToken(token);
+    }
+  };
+
+  const handleToTokenChange = (token: Token) => {
+    if (token.id === fromToken?.id) {
+      // If same as from token, swap them
+      setToToken(fromToken);
+      setFromToken(toToken);
+    } else {
+      setToToken(token);
+    }
+  };
+
+  const handleFromAmountChange = (value: string) => {
+    const amount = parseFloat(value);
+    if (isNaN(amount)) {
+      setFromAmount(0);
+      setToAmount(0);
+    } else {
+      setFromAmount(amount);
+    }
+  };
+
+  const switchTokens = () => {
+    const tempFromToken = fromToken;
+    const tempToToken = toToken;
+    setFromToken(tempToToken);
+    setToToken(tempFromToken);
     
-    // Check if user has enough balance
-    if (fromToken.balance < fromAmount) {
+    // Reset amounts
+    if (toAmount !== null) {
+      setFromAmount(toAmount);
+    }
+  };
+
+  const refreshRate = () => {
+    calculateExchangeRate();
+    
+    toast({
+      title: "Rate Updated",
+      description: "The exchange rate has been refreshed with the latest market data."
+    });
+  };
+
+  const handleSwap = async () => {
+    if (!fromToken || !toToken || !fromAmount || fromAmount <= 0 || !toAmount) {
       toast({
-        title: "Insufficient balance",
-        description: `You don't have enough ${fromToken.symbol} tokens for this swap.`,
+        title: "Invalid swap parameters",
+        description: "Please ensure all swap details are correctly specified.",
         variant: "destructive"
       });
       return;
     }
-    
-    setIsSwapping(true);
-    
-    // Simulate transaction processing
-    setTimeout(async () => {
-      // Update balances
-      updateTokenBalance(fromToken.id, -fromAmount);
-      updateTokenBalance(toToken.id, toAmount);
-      
-      // Add sell transaction for fromToken
-      await addTransaction({
-        type: 'sell',
-        asset: fromToken.name,
-        amount: fromAmount,
-        value: fromAmount * fromToken.price,
-        status: 'completed'
-      });
-      
-      // Add buy transaction for toToken
-      await addTransaction({
-        type: 'buy',
-        asset: toToken.name,
-        amount: toAmount,
-        value: toAmount * toToken.price,
-        status: 'completed'
-      });
-      
-      // Show success message
+
+    if (fromAmount > fromToken.balance) {
       toast({
-        title: "Swap successful",
-        description: `Swapped ${fromAmount} ${fromToken.symbol} for ${toAmount.toFixed(4)} ${toToken.symbol}`,
+        title: "Insufficient balance",
+        description: `You don't have enough ${fromToken.symbol} to complete this swap.`,
+        variant: "destructive"
       });
-      
+      return;
+    }
+
+    setIsSwapping(true);
+
+    try {
+      // Deduct from source token
+      updateTokenBalance(fromToken.id, -fromAmount);
+
+      // Add to destination token if it exists in portfolio, otherwise add it
+      const existingToken = tokens.find(t => t.id === toToken.id);
+      if (existingToken) {
+        updateTokenBalance(toToken.id, toAmount);
+      } else {
+        const newToken = {
+          ...toToken,
+          balance: toAmount
+        };
+        addToken(newToken);
+      }
+
+      // Record transaction
+      await addTransaction({
+        type: 'swap',
+        asset: fromToken.id,
+        toAsset: toToken.id,
+        amount: fromAmount,
+        value: fromToken.price * fromAmount,
+        status: 'completed'
+      });
+
+      toast({
+        title: "Swap Successful",
+        description: `Swapped ${fromAmount} ${fromToken.symbol} for ${toAmount.toFixed(4)} ${toToken.symbol}`
+      });
+
       // Reset form
       setFromAmount(0);
       setToAmount(0);
+    } catch (error) {
+      console.error("Error performing swap:", error);
+      toast({
+        title: "Swap Failed",
+        description: "There was an error processing your swap. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsSwapping(false);
-    }, 1500);
-  };
-  
-  const switchTokens = () => {
-    const tempToken = fromToken;
-    setFromToken(toToken);
-    setToToken(tempToken);
-    
-    if (fromAmount > 0) {
-      setFromAmount(toAmount);
-      setToAmount(fromAmount);
     }
-  };
-  
-  const refreshRate = () => {
-    calculateExchangeRate();
   };
 
   return {
