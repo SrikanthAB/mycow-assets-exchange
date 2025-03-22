@@ -4,29 +4,69 @@ import { usePortfolio } from "@/contexts/portfolio";
 import { Button } from "@/components/ui/button";
 import PortfolioSummary from "./PortfolioSummary";
 import AssetCard from "./AssetCard";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+// Categories for filtering assets
+const categories = [
+  "All Assets",
+  "Real Estate",
+  "Commodity",
+  "Entertainment",
+  "Private Credit",
+  "Stablecoin",
+  "Native Token"
+];
 
 const PortfolioSection = () => {
   const { tokens, getTotalPortfolioValue } = usePortfolio();
   const totalValue = getTotalPortfolioValue();
+  const [activeCategory, setActiveCategory] = React.useState("All Assets");
+  
+  // Filter tokens by category
+  const filteredTokens = activeCategory === "All Assets" 
+    ? tokens 
+    : tokens.filter(token => token.category === activeCategory);
 
   return (
     <div className="space-y-6">
       <PortfolioSummary totalValue={totalValue} />
       
       <div className="space-y-4">
-        <h3 className="text-xl font-medium">Your Assets</h3>
+        <h2 className="text-2xl font-bold">Your Assets</h2>
+        <p className="text-muted-foreground">
+          Manage your token holdings and track their performance
+        </p>
         
         {tokens.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 bg-white rounded-xl p-6 shadow-sm">
             <p className="text-muted-foreground">You don't have any assets yet.</p>
             <Button className="mt-4">Browse Markets</Button>
           </div>
         ) : (
-          <div className="grid gap-4">
-            {tokens.map(token => (
-              <AssetCard key={token.id} token={token} />
-            ))}
-          </div>
+          <Tabs defaultValue="All Assets" className="animate-fade-in">
+            <div className="mb-8 border-b border-border overflow-x-auto pb-1">
+              <TabsList className="bg-transparent h-auto p-0 space-x-6">
+                {categories.map((category) => (
+                  <TabsTrigger 
+                    key={category} 
+                    value={category}
+                    className="px-1 py-2 text-base data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    {category}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
+            
+            <TabsContent value={activeCategory} className="mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredTokens.map(token => (
+                  <AssetCard key={token.id} token={token} />
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </div>
