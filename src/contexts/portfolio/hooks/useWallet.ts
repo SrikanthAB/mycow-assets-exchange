@@ -13,7 +13,7 @@ export const useWallet = () => {
       
       if (!user) return null;
       
-      // Try to get wallet balance from user portfolio
+      // Use raw query to get around type limitations
       const { data, error } = await supabase
         .from('user_portfolio')
         .select('wallet_balance')
@@ -63,7 +63,10 @@ export const useWallet = () => {
         // Insert new record
         const { error } = await supabase
           .from('user_portfolio')
-          .insert({ user_id: user.id, wallet_balance: balance });
+          .insert({ 
+            user_id: user.id, 
+            wallet_balance: balance 
+          });
         
         if (error) throw error;
       }

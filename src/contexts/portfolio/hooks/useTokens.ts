@@ -14,7 +14,7 @@ export const useTokens = () => {
       
       if (!user) return null;
       
-      // Try to get tokens from user metadata
+      // Use raw query to get around type limitations
       const { data, error } = await supabase
         .from('user_portfolio')
         .select('tokens')
@@ -64,7 +64,10 @@ export const useTokens = () => {
         // Insert new record
         const { error } = await supabase
           .from('user_portfolio')
-          .insert({ user_id: user.id, tokens: tokensToSave });
+          .insert({ 
+            user_id: user.id, 
+            tokens: tokensToSave 
+          });
         
         if (error) throw error;
       }

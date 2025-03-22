@@ -72,6 +72,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_portfolio: {
+        Row: {
+          created_at: string | null
+          id: string
+          tokens: Json | null
+          updated_at: string | null
+          user_id: string
+          wallet_balance: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          tokens?: Json | null
+          updated_at?: string | null
+          user_id: string
+          wallet_balance?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          tokens?: Json | null
+          updated_at?: string | null
+          user_id?: string
+          wallet_balance?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
