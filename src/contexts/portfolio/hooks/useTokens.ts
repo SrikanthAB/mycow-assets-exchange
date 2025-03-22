@@ -30,7 +30,12 @@ export const useTokens = () => {
       
       // Convert from Json to Token[] with proper type checking
       if (data?.tokens && Array.isArray(data.tokens)) {
-        return data.tokens as Token[];
+        // First cast to unknown, then to Token[] to satisfy TypeScript
+        const tokenArray = data.tokens as unknown;
+        // Validate that the data has the expected structure before returning
+        if (isValidTokenArray(tokenArray)) {
+          return tokenArray as Token[];
+        }
       }
       
       return null;
@@ -38,6 +43,25 @@ export const useTokens = () => {
       console.error('Error loading tokens:', error);
       return null;
     }
+  };
+
+  // Helper function to validate token data
+  const isValidTokenArray = (data: unknown): boolean => {
+    if (!Array.isArray(data)) return false;
+    
+    // Check if each item has the required Token properties
+    return data.every(item => 
+      typeof item === 'object' && 
+      item !== null &&
+      'id' in item && 
+      'name' in item && 
+      'symbol' in item && 
+      'category' in item && 
+      'price' in item &&
+      'priceString' in item &&
+      'change' in item &&
+      'balance' in item
+    );
   };
 
   // Save tokens to Supabase
