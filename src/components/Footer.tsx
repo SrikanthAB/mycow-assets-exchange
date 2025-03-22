@@ -32,7 +32,6 @@ const Footer = () => {
         { name: "MyCow RWA's", path: "/rwas", isComingSoon: true },
         { name: "MyCow Exchange", path: "/exchange", isComingSoon: true },
         { name: "MyCow Stable Coin", path: "/stablecoin", isComingSoon: true },
-        { name: "Markets", path: "/markets" }, // Existing route
       ]
     },
     {
