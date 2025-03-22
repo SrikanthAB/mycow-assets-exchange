@@ -8,7 +8,13 @@ export const PortfolioContext = createContext<PortfolioContextType | undefined>(
 
 export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
   // Initialize hooks for different parts of the portfolio functionality
-  const { transactions, isLoading, addTransaction } = useTransactions();
+  const { 
+    transactions, 
+    isLoading, 
+    addTransaction,
+    seedInitialTransactions
+  } = useTransactions();
+  
   const { 
     tokens, 
     setTokens,
@@ -46,23 +52,30 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
 
   // Enhance transaction with token name resolution
   const enhancedAddTransaction = async (transaction: any) => {
-    // Resolve token name from ID if needed
-    if (transaction.asset && !transaction.asset.includes(' ')) {
-      const token = tokens.find(t => t.id === transaction.asset);
-      if (token) {
-        transaction = {
-          ...transaction,
-          asset: token.name
-        };
+    try {
+      // Resolve token name from ID if needed
+      if (transaction.asset && !transaction.asset.includes(' ')) {
+        const token = tokens.find(t => t.id === transaction.asset);
+        if (token) {
+          transaction = {
+            ...transaction,
+            asset: token.name
+          };
+        }
       }
+      
+      // Add transaction to history
+      const savedTransaction = await addTransaction(transaction);
+      
+      // Save tokens and wallet balance after transaction is added
+      await saveTokensToStorage(tokens);
+      await saveWalletBalance(walletBalance);
+      
+      return savedTransaction;
+    } catch (error) {
+      console.error("Error in enhancedAddTransaction:", error);
+      throw error;
     }
-    
-    // Add transaction to history
-    await addTransaction(transaction);
-
-    // Save tokens and wallet balance after transaction is added
-    await saveTokensToStorage(tokens);
-    await saveWalletBalance(walletBalance);
   };
 
   // Load user data on initial load
@@ -73,16 +86,26 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
+          console.log("Loading user data for user:", user.id);
+          
           // Load tokens and wallet balance
           const userTokens = await loadTokensFromStorage();
           if (userTokens && userTokens.length > 0) {
+            console.log("Loaded user tokens:", userTokens.length);
             setTokens(userTokens);
+          } else {
+            console.log("No tokens found in storage, using initial tokens");
           }
           
           const userWalletBalance = await loadWalletBalance();
           if (userWalletBalance !== null) {
+            console.log("Loaded wallet balance:", userWalletBalance);
             setWalletBalance(userWalletBalance);
+          } else {
+            console.log("No wallet balance found, using initial balance");
           }
+        } else {
+          console.log("No authenticated user found");
         }
       } catch (error) {
         console.error("Error loading user portfolio data:", error);
@@ -128,7 +151,8 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
       addLoan,
       repayLoan,
       isLoading,
-      toggleTokenStaking
+      toggleTokenStaking,
+      seedInitialTransactions
     }}>
       {children}
     </PortfolioContext.Provider>

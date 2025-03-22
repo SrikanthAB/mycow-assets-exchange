@@ -58,9 +58,10 @@ export interface PortfolioContextType {
   getAvailablePortfolioValue: () => number;
   addFunds: (amount: number) => void;
   deductFunds: (amount: number) => boolean;
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => Promise<Transaction>;
   addLoan: (loan: Omit<Loan, 'id'>) => void;
   repayLoan: (id: string) => void;
   isLoading: boolean;
   toggleTokenStaking: (id: string, isStaked: boolean, yieldRate?: string) => void;
+  seedInitialTransactions?: () => Promise<void>;
 }

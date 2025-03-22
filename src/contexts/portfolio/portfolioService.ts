@@ -24,6 +24,8 @@ export const fetchTransactions = async () => {
       throw error;
     }
     
+    console.log('Retrieved transactions from Supabase:', data);
+    
     // Transform data to match our Transaction interface
     const formattedTransactions: Transaction[] = data.map(item => ({
       id: item.id,
@@ -56,7 +58,8 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
     // Create a current date in ISO format
     const currentDate = new Date().toISOString();
     
-    const { error } = await supabase
+    // Insert the transaction record
+    const { data, error } = await supabase
       .from('transactions')
       .insert({
         type: transaction.type,
@@ -64,17 +67,31 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
         amount: transaction.amount,
         value: transaction.value,
         status: transaction.status,
-        user_id: user.id, // Add the user_id to the transaction record
-        to_asset: transaction.toAsset, // Include the destination asset for swap transactions
-        date: currentDate // Explicitly set the date
-      });
+        user_id: user.id, 
+        to_asset: transaction.toAsset,
+        date: currentDate
+      })
+      .select('*')
+      .single();
       
     if (error) {
       console.error('Error adding transaction to Supabase:', error);
       throw error;
     }
     
-    console.log('Transaction saved successfully with user_id:', user.id);
+    console.log('Transaction saved successfully in Supabase:', data);
+    
+    // Return the created transaction data
+    return {
+      id: data.id,
+      date: data.date,
+      type: data.type as 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock' | 'loan' | 'repayment' | 'stake' | 'unstake' | 'swap',
+      asset: data.asset,
+      amount: Number(data.amount),
+      value: Number(data.value),
+      status: data.status as 'completed' | 'pending' | 'failed',
+      toAsset: data.to_asset
+    };
   } catch (error) {
     console.error('Error in saveTransaction:', error);
     throw error;
