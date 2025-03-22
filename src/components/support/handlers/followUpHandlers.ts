@@ -17,11 +17,19 @@ export const useFollowUpHandlers = (
     setIsLoading(true);
 
     try {
+      // The issue is here - we need to get the messages directly, not from the setMessages call
+      // First, get the current messages
+      let currentMessages: Message[] = [];
+      setMessages(prev => {
+        currentMessages = prev;
+        return prev;
+      });
+
       // Call the AI support edge function with the selected question and follow-up
       const { data, error } = await supabase.functions.invoke('ai-support', {
         body: { 
           message: `${selectedQuestion}: ${optionText}`,
-          chatHistory: getFilteredChatHistory(await setMessages(prev => prev))
+          chatHistory: getFilteredChatHistory(currentMessages)
         }
       });
 
