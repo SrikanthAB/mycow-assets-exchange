@@ -1,7 +1,7 @@
 
 import { Message } from '../types';
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 // Helper function to create a user message
 export const createUserMessage = (text: string): Message => ({
@@ -38,7 +38,6 @@ export const sendMessage = async (
   setMessages((prev) => [...prev, userMessage]);
   setInputValue('');
   setIsLoading(true);
-  const { toast } = useToast();
 
   try {
     // Show connect agent button after user sends their first message
@@ -102,3 +101,4 @@ export const handleConnectAgent = (setMessages: React.Dispatch<React.SetStateAct
   
   setMessages((prev) => [...prev, connectMessage]);
 };
+

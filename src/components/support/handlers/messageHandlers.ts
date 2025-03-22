@@ -1,7 +1,7 @@
 
 import { Message, CallbackFormData } from '../types';
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { SUPPORT_QUESTIONS, FOLLOW_UP_OPTIONS } from '../constants';
 
 // Helper function to create a user message
@@ -251,7 +251,7 @@ const getFilteredChatHistory = (setMessages: React.Dispatch<React.SetStateAction
 const handleAIError = (
   error: any, 
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
-  toast: ReturnType<typeof useToast>
+  toast: ReturnType<typeof useToast>["toast"]
 ) => {
   console.error('Error in AI chat:', error);
   toast({
@@ -267,3 +267,4 @@ const handleAIError = (
   
   setMessages(prevMessages => [...prevMessages, errorResponse]);
 };
+
