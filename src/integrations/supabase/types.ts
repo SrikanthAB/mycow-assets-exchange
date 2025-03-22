@@ -36,6 +36,42 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          amount: number
+          asset: string | null
+          created_at: string
+          date: string
+          id: string
+          status: string
+          type: string
+          user_id: string | null
+          value: number
+        }
+        Insert: {
+          amount: number
+          asset?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          status: string
+          type: string
+          user_id?: string | null
+          value: number
+        }
+        Update: {
+          amount?: number
+          asset?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          status?: string
+          type?: string
+          user_id?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

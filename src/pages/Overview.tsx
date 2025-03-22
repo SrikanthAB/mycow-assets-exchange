@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { usePortfolio } from "@/contexts/PortfolioContext";
-import { TrendingUp, TrendingDown, Download, History as HistoryIcon, Wallet as WalletIcon, PieChart } from "lucide-react";
+import { TrendingUp, TrendingDown, Download, History as HistoryIcon, Wallet as WalletIcon, PieChart, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/components/ui/use-toast";
 
 const Overview = () => {
-  const { tokens, walletBalance, getTotalPortfolioValue, transactions } = usePortfolio();
+  const { tokens, walletBalance, getTotalPortfolioValue, transactions, isLoading } = usePortfolio();
   const totalValue = getTotalPortfolioValue();
   const { toast } = useToast();
   
@@ -28,6 +27,7 @@ const Overview = () => {
       <Navbar />
       
       <main className="pt-24 pb-16">
+        
         <section className="py-8 md:py-12">
           <div className="container mx-auto px-4">
             <div className="mb-10">
@@ -206,44 +206,55 @@ const Overview = () => {
                     </Button>
                   </CardHeader>
                   <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Details</TableHead>
-                          <TableHead className="text-right">Amount</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {transactions.map((transaction) => (
-                          <TableRow key={transaction.id}>
-                            <TableCell>
-                              {new Date(transaction.date).toLocaleDateString('en-IN')}
-                            </TableCell>
-                            <TableCell className="capitalize">{transaction.type}</TableCell>
-                            <TableCell>
-                              {transaction.asset ? transaction.asset : 
-                                transaction.type === 'deposit' ? 'Added funds' : 'Withdrawn funds'}
-                            </TableCell>
-                            <TableCell className="text-right font-medium">
-                              ₹{transaction.value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                            </TableCell>
-                            <TableCell>
-                              <div className={cn(
-                                "px-2 py-1 rounded-full text-xs inline-block capitalize font-medium",
-                                transaction.status === 'completed' ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
-                                transaction.status === 'pending' ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
-                                "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                              )}>
-                                {transaction.status}
-                              </div>
-                            </TableCell>
+                    {isLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                        <span className="ml-2 text-muted-foreground">Loading transactions...</span>
+                      </div>
+                    ) : transactions.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No transactions found. Start trading to see your history here.
+                      </div>
+                    ) : (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Details</TableHead>
+                            <TableHead className="text-right">Amount</TableHead>
+                            <TableHead>Status</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {transactions.map((transaction) => (
+                            <TableRow key={transaction.id}>
+                              <TableCell>
+                                {new Date(transaction.date).toLocaleDateString('en-IN')}
+                              </TableCell>
+                              <TableCell className="capitalize">{transaction.type}</TableCell>
+                              <TableCell>
+                                {transaction.asset ? transaction.asset : 
+                                  transaction.type === 'deposit' ? 'Added funds' : 'Withdrawn funds'}
+                              </TableCell>
+                              <TableCell className="text-right font-medium">
+                                ₹{transaction.value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                              </TableCell>
+                              <TableCell>
+                                <div className={cn(
+                                  "px-2 py-1 rounded-full text-xs inline-block capitalize font-medium",
+                                  transaction.status === 'completed' ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
+                                  transaction.status === 'pending' ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                                  "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                )}>
+                                  {transaction.status}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

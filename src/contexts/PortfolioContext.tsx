@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Define token types
 export interface Token {
@@ -37,6 +38,7 @@ interface PortfolioContextType {
   addFunds: (amount: number) => void;
   deductFunds: (amount: number) => boolean;
   addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
+  isLoading: boolean;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -92,57 +94,50 @@ const initialTokens: Token[] = [
 // Initial wallet balance (10,00,000 rupees as requested)
 const initialWalletBalance = 1000000;
 
-// Initial transactions
-const initialTransactions: Transaction[] = [
-  {
-    id: '1',
-    date: '2023-10-15T10:30:00',
-    type: 'buy',
-    asset: 'Embassy REIT',
-    amount: 5,
-    value: 1782.10,
-    status: 'completed'
-  },
-  {
-    id: '2',
-    date: '2023-10-10T14:45:00',
-    type: 'deposit',
-    amount: 50000,
-    value: 50000,
-    status: 'completed'
-  },
-  {
-    id: '3',
-    date: '2023-10-05T09:15:00',
-    type: 'sell',
-    asset: 'Digital Gold',
-    amount: 1.5,
-    value: 10867.95,
-    status: 'completed'
-  },
-  {
-    id: '4',
-    date: '2023-09-28T16:20:00',
-    type: 'buy',
-    asset: 'Movie Fund I',
-    amount: 10,
-    value: 1156.70,
-    status: 'completed'
-  },
-  {
-    id: '5',
-    date: '2023-09-20T11:05:00',
-    type: 'withdrawal',
-    amount: 25000,
-    value: 25000,
-    status: 'completed'
-  }
-];
-
 export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
   const [tokens, setTokens] = useState<Token[]>(initialTokens);
   const [walletBalance, setWalletBalance] = useState<number>(initialWalletBalance);
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Fetch transactions from Supabase on component mount
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('transactions')
+          .select('*')
+          .order('date', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching transactions:', error);
+          return;
+        }
+        
+        if (data) {
+          // Transform data to match our Transaction interface
+          const formattedTransactions: Transaction[] = data.map(item => ({
+            id: item.id,
+            date: item.date,
+            type: item.type as 'buy' | 'sell' | 'deposit' | 'withdrawal',
+            asset: item.asset,
+            amount: Number(item.amount),
+            value: Number(item.value),
+            status: item.status as 'completed' | 'pending' | 'failed'
+          }));
+          
+          setTransactions(formattedTransactions);
+        }
+      } catch (error) {
+        console.error('Error in fetchTransactions:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   const addToken = (token: Token) => {
     setTokens(prev => [...prev, token]);
@@ -180,14 +175,35 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
-  // Add transaction to history
-  const addTransaction = (transaction: Omit<Transaction, 'id' | 'date'>) => {
+  // Add transaction to history and save to Supabase
+  const addTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
     const newTransaction: Transaction = {
       ...transaction,
       id: Date.now().toString(),
       date: new Date().toISOString(),
     };
+    
+    // Add to local state first for immediate UI update
     setTransactions(prev => [newTransaction, ...prev]);
+    
+    // Then save to Supabase
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .insert({
+          type: transaction.type,
+          asset: transaction.asset,
+          amount: transaction.amount,
+          value: transaction.value,
+          status: transaction.status
+        });
+        
+      if (error) {
+        console.error('Error adding transaction to Supabase:', error);
+      }
+    } catch (error) {
+      console.error('Error in addTransaction:', error);
+    }
   };
 
   return (
@@ -201,7 +217,8 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
       getTotalPortfolioValue,
       addFunds,
       deductFunds,
-      addTransaction
+      addTransaction,
+      isLoading
     }}>
       {children}
     </PortfolioContext.Provider>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -88,13 +87,13 @@ const Swaps = () => {
     setIsSwapping(true);
     
     // Simulate transaction processing
-    setTimeout(() => {
+    setTimeout(async () => {
       // Update balances
       updateTokenBalance(fromToken.id, -fromAmount);
       updateTokenBalance(toToken.id, toAmount);
       
       // Add sell transaction for fromToken
-      addTransaction({
+      await addTransaction({
         type: 'sell',
         asset: fromToken.name,
         amount: fromAmount,
@@ -103,7 +102,7 @@ const Swaps = () => {
       });
       
       // Add buy transaction for toToken
-      addTransaction({
+      await addTransaction({
         type: 'buy',
         asset: toToken.name,
         amount: toAmount,
