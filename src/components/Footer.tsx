@@ -9,7 +9,7 @@ const Footer = () => {
     {
       title: "Products",
       links: [
-        { name: "Assets", path: "/markets" }, // Redirecting to existing markets page
+        { name: "Overview", path: "/overview" }, // Changed from Assets to Overview
         { name: "Markets", path: "/markets" }, // Existing route
         { name: "Swaps", path: "/swaps" }, // Existing route
         { name: "Staking", path: "/staking" }, // Existing route
@@ -60,6 +60,9 @@ const Footer = () => {
       });
     } else if (link.isExternal && link.url) {
       // External links open in a new tab, no need to prevent default
+    } else {
+      // For internal links that are not "coming soon", scroll to top of page
+      window.scrollTo(0, 0);
     }
   };
   
