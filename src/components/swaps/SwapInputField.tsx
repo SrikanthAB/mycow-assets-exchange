@@ -28,7 +28,7 @@ const SwapInputField = ({
   const isLocked = token?.locked && token?.lockedAmount && token?.lockedAmount >= token?.balance;
   
   return (
-    <div className="mt-2 mb-4 bg-white p-4 rounded-xl border border-gray-200">
+    <div className="mt-2 mb-4 bg-[#1e293b] p-4 rounded-xl border border-blue-900/30">
       <TokenSelector
         tokens={tokens}
         selectedToken={token}
@@ -45,7 +45,7 @@ const SwapInputField = ({
           placeholder={placeholder}
           min="0"
           step="0.01"
-          className={`w-full bg-white border-gray-200 focus:border-primary/40 ${readOnly || isLocked ? "bg-gray-50" : ""}`}
+          className={`w-full bg-[#0f172a] border-blue-900/30 focus:border-primary/40 text-white ${readOnly || isLocked ? "bg-[#0f172a]/70" : ""}`}
           readOnly={readOnly || isLocked}
         />
         
