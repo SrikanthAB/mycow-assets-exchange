@@ -23,7 +23,7 @@ export const initialTokens: Token[] = [
     priceString: "₹7,245.30",
     change: 0.87,
     balance: 2.5,
-    yield: "0.5% APY"
+    yield: "4% APY"
   },
   {
     id: "3",
@@ -51,3 +51,4 @@ export const initialTokens: Token[] = [
 
 // Initial wallet balance (10,00,000 rupees as requested)
 export const initialWalletBalance = 1000000;
+
