@@ -1,8 +1,10 @@
 
-import { ArrowUpRight, TrendingUp, TrendingDown, Lock } from "lucide-react";
+import { ArrowUpRight, TrendingUp, TrendingDown, Lock, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useState } from "react";
+import AssetDetailsModal from "./AssetDetailsModal";
 
 interface AssetCardProps {
   name: string;
@@ -18,6 +20,7 @@ interface AssetCardProps {
 
 const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldValue, onBuy, locked }: AssetCardProps) => {
   const isPositiveChange = change >= 0;
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   
   return (
     <div className="asset-card bg-[#0f172a] text-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300">
@@ -54,9 +57,27 @@ const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldV
             </div>
           </div>
         </div>
-        <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500/20">
-          <ArrowUpRight size={16} />
-        </button>
+        <div className="flex gap-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={() => setIsDetailsOpen(true)}
+                  className="p-1.5 rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                >
+                  <Info size={16} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">View asset details</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-blue-500/10 text-blue-400 hover:bg-blue-500/20">
+            <ArrowUpRight size={16} />
+          </button>
+        </div>
       </div>
       
       <div className="mt-4 flex items-end justify-between">
@@ -97,6 +118,12 @@ const AssetCard = ({ name, symbol, image, price, change, category, yield: yieldV
           </Button>
         </div>
       )}
+
+      <AssetDetailsModal
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        asset={{ id: symbol, name, symbol, category, price, change, yield: yieldValue }}
+      />
     </div>
   );
 };
