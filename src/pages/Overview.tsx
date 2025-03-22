@@ -11,69 +11,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 
-// Define transaction interface
-interface Transaction {
-  id: string;
-  date: string;
-  type: 'buy' | 'sell' | 'deposit' | 'withdrawal';
-  asset?: string;
-  amount: number;
-  value: number;
-  status: 'completed' | 'pending' | 'failed';
-}
-
-// Mock transaction data
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    date: '2023-10-15T10:30:00',
-    type: 'buy',
-    asset: 'Embassy REIT',
-    amount: 5,
-    value: 1782.10,
-    status: 'completed'
-  },
-  {
-    id: '2',
-    date: '2023-10-10T14:45:00',
-    type: 'deposit',
-    amount: 50000,
-    value: 50000,
-    status: 'completed'
-  },
-  {
-    id: '3',
-    date: '2023-10-05T09:15:00',
-    type: 'sell',
-    asset: 'Digital Gold',
-    amount: 1.5,
-    value: 10867.95,
-    status: 'completed'
-  },
-  {
-    id: '4',
-    date: '2023-09-28T16:20:00',
-    type: 'buy',
-    asset: 'Movie Fund I',
-    amount: 10,
-    value: 1156.70,
-    status: 'completed'
-  },
-  {
-    id: '5',
-    date: '2023-09-20T11:05:00',
-    type: 'withdrawal',
-    amount: 25000,
-    value: 25000,
-    status: 'completed'
-  }
-];
-
 const Overview = () => {
-  const { tokens, walletBalance, getTotalPortfolioValue } = usePortfolio();
+  const { tokens, walletBalance, getTotalPortfolioValue, transactions } = usePortfolio();
   const totalValue = getTotalPortfolioValue();
   const { toast } = useToast();
-  const [transactions] = useState<Transaction[]>(mockTransactions);
   
   const downloadStatement = () => {
     toast({

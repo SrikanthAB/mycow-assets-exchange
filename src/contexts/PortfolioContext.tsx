@@ -15,15 +15,28 @@ export interface Token {
   yield?: string;
 }
 
+// Define transaction interface
+export interface Transaction {
+  id: string;
+  date: string;
+  type: 'buy' | 'sell' | 'deposit' | 'withdrawal';
+  asset?: string;
+  amount: number;
+  value: number;
+  status: 'completed' | 'pending' | 'failed';
+}
+
 interface PortfolioContextType {
   tokens: Token[];
   walletBalance: number;
+  transactions: Transaction[];
   addToken: (token: Token) => void;
   removeToken: (id: string) => void;
   updateTokenBalance: (id: string, amount: number) => void;
   getTotalPortfolioValue: () => number;
   addFunds: (amount: number) => void;
   deductFunds: (amount: number) => boolean;
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -79,9 +92,57 @@ const initialTokens: Token[] = [
 // Initial wallet balance (10,00,000 rupees as requested)
 const initialWalletBalance = 1000000;
 
+// Initial transactions
+const initialTransactions: Transaction[] = [
+  {
+    id: '1',
+    date: '2023-10-15T10:30:00',
+    type: 'buy',
+    asset: 'Embassy REIT',
+    amount: 5,
+    value: 1782.10,
+    status: 'completed'
+  },
+  {
+    id: '2',
+    date: '2023-10-10T14:45:00',
+    type: 'deposit',
+    amount: 50000,
+    value: 50000,
+    status: 'completed'
+  },
+  {
+    id: '3',
+    date: '2023-10-05T09:15:00',
+    type: 'sell',
+    asset: 'Digital Gold',
+    amount: 1.5,
+    value: 10867.95,
+    status: 'completed'
+  },
+  {
+    id: '4',
+    date: '2023-09-28T16:20:00',
+    type: 'buy',
+    asset: 'Movie Fund I',
+    amount: 10,
+    value: 1156.70,
+    status: 'completed'
+  },
+  {
+    id: '5',
+    date: '2023-09-20T11:05:00',
+    type: 'withdrawal',
+    amount: 25000,
+    value: 25000,
+    status: 'completed'
+  }
+];
+
 export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
   const [tokens, setTokens] = useState<Token[]>(initialTokens);
   const [walletBalance, setWalletBalance] = useState<number>(initialWalletBalance);
+  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
 
   const addToken = (token: Token) => {
     setTokens(prev => [...prev, token]);
@@ -119,16 +180,28 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
+  // Add transaction to history
+  const addTransaction = (transaction: Omit<Transaction, 'id' | 'date'>) => {
+    const newTransaction: Transaction = {
+      ...transaction,
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+    };
+    setTransactions(prev => [newTransaction, ...prev]);
+  };
+
   return (
     <PortfolioContext.Provider value={{ 
       tokens, 
       walletBalance,
+      transactions,
       addToken, 
       removeToken, 
       updateTokenBalance,
       getTotalPortfolioValue,
       addFunds,
-      deductFunds
+      deductFunds,
+      addTransaction
     }}>
       {children}
     </PortfolioContext.Provider>

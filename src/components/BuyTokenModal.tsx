@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const BuyTokenModal = ({ isOpen, onClose, asset }: BuyTokenModalProps) => {
   const [upiId, setUpiId] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const { toast } = useToast();
-  const { addToken, tokens, updateTokenBalance, walletBalance, deductFunds } = usePortfolio();
+  const { addToken, tokens, updateTokenBalance, walletBalance, deductFunds, addTransaction } = usePortfolio();
   
   const totalCost = amount * asset.numericPrice;
   const isWalletSufficient = walletBalance >= totalCost;
@@ -85,6 +84,15 @@ const BuyTokenModal = ({ isOpen, onClose, asset }: BuyTokenModalProps) => {
           yield: asset.yield
         });
       }
+      
+      // Add transaction to history
+      addTransaction({
+        type: 'buy',
+        asset: asset.name,
+        amount: amount,
+        value: totalCost,
+        status: 'completed'
+      });
       
       // Show success message
       toast({
