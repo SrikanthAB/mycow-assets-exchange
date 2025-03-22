@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Transaction } from "../types";
 import { fetchTransactions, saveTransaction } from "../portfolioService";
@@ -169,68 +170,68 @@ export const useTransactions = () => {
         {
           id: "loan-tx-1",
           date: new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-          type: 'loan',
+          type: 'loan' as const,
           asset: "Digital Gold",
           amount: 0.1,
           value: 10000,
-          status: 'completed'
+          status: 'completed' as const
         },
         // Purchase transactions for all initial tokens
         {
           id: "purchase-tx-1",
           date: new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000).toISOString(), // 6 days ago
-          type: 'buy',
+          type: 'buy' as const,
           asset: "Embassy REIT",
           amount: 10,
           value: 3564.20,
-          status: 'completed'
+          status: 'completed' as const
         },
         {
           id: "purchase-tx-2",
           date: new Date(today.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-          type: 'buy',
+          type: 'buy' as const,
           asset: "Digital Gold",
           amount: 2.5,
           value: 18113.25,
-          status: 'completed'
+          status: 'completed' as const
         },
         {
           id: "purchase-tx-3",
           date: new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(), // 4 days ago
-          type: 'buy',
+          type: 'buy' as const,
           asset: "Movie Fund I",
           amount: 25,
           value: 2891.75,
-          status: 'completed'
+          status: 'completed' as const
         },
         {
           id: "purchase-tx-4",
           date: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-          type: 'buy',
+          type: 'buy' as const,
           asset: "MyCow Token",
           amount: 100,
           value: 2437.00,
-          status: 'completed'
+          status: 'completed' as const
         },
         // Add a deposit transaction
         {
           id: "deposit-tx-1",
           date: new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
-          type: 'deposit',
+          type: 'deposit' as const,
           asset: "Wallet",
           amount: 1,
           value: 1000000,
-          status: 'completed'
+          status: 'completed' as const
         },
         // Add a small sell transaction
         {
           id: "sell-tx-1",
           date: new Date(today.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-          type: 'sell',
+          type: 'sell' as const,
           asset: "Movie Fund I",
           amount: 5,
           value: 578.35,
-          status: 'completed'
+          status: 'completed' as const
         }
       ];
       
