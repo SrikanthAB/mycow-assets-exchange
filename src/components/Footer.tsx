@@ -11,7 +11,7 @@ const Footer = () => {
   const handleLinkClick = (link: any, e: React.MouseEvent) => {
     if (link.isComingSoon) {
       e.preventDefault();
-      // Show toast notification for coming soon pages
+      // Show toast notification for coming soon pages - using string format instead of object with title
       toast(`The ${link.name} page is under development and will be available soon.`);
     } else if (link.isExternal && link.url) {
       // External links open in a new tab, no need to prevent default
