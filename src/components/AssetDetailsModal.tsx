@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -67,6 +66,7 @@ const AssetDetailsModal = ({ open, onOpenChange, asset }: AssetDetailsModalProps
           pegged: asset.name.includes("Gold") ? "Gold Price" : "Indian Rupee",
           backing: asset.name.includes("Gold") ? "100% Physical Gold Reserves" : "100% Cash Reserves",
           custodian: "IDBI Bank",
+          location: "Stored in LBMA Vaults outside India (Singapore/Switzerland)",
           redemption: "T+1 Settlement",
           audit: "Monthly",
           regulation: "RBI Compliant",
@@ -246,6 +246,7 @@ const AssetDetailsModal = ({ open, onOpenChange, asset }: AssetDetailsModalProps
                     <div>
                       <h3 className="font-medium">Security & Compliance</h3>
                       <p className="text-sm text-muted-foreground">Custodian: {details.custodian}</p>
+                      <p className="text-sm text-muted-foreground">Storage Location: {details.location}</p>
                       <p className="text-sm text-muted-foreground">Audit Frequency: {details.audit}</p>
                       <p className="text-sm text-muted-foreground">Regulatory Status: {details.regulation}</p>
                     </div>
