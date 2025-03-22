@@ -30,6 +30,49 @@ const StakingStats = ({ stakedTokens }: StakingStatsProps) => {
   const totalAnnualYield = annualPrimaryYield + annualSecondaryYield;
   const combinedYieldRate = totalStakedValue > 0 ? (totalAnnualYield / totalStakedValue) * 100 : 0;
   
+  // Calculate breakdown of staked assets by category
+  const categoryBreakdown = stakedTokens.reduce((acc, token) => {
+    const category = token.category;
+    const value = token.price * token.balance;
+    
+    if (!acc[category]) {
+      acc[category] = { value: 0, percentage: 0 };
+    }
+    
+    acc[category].value += value;
+    return acc;
+  }, {} as Record<string, { value: number, percentage: number }>);
+  
+  // Calculate percentages
+  if (totalStakedValue > 0) {
+    Object.keys(categoryBreakdown).forEach(category => {
+      categoryBreakdown[category].percentage = (categoryBreakdown[category].value / totalStakedValue) * 100;
+    });
+  }
+  
+  // Sort categories by value (descending)
+  const sortedCategories = Object.entries(categoryBreakdown)
+    .sort(([, a], [, b]) => b.value - a.value)
+    .map(([category, { percentage }]) => ({ 
+      category, 
+      percentage,
+      color: getCategoryColor(category)
+    }));
+  
+  // If there are fewer than 4 categories, add an "Other" category
+  if (sortedCategories.length > 4) {
+    const topCategories = sortedCategories.slice(0, 3);
+    const otherPercentage = sortedCategories.slice(3).reduce((sum, item) => sum + item.percentage, 0);
+    
+    topCategories.push({
+      category: "Other RWAs",
+      percentage: otherPercentage,
+      color: "purple-500"
+    });
+    
+    sortedCategories.splice(0, sortedCategories.length, ...topCategories);
+  }
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
       <Card className={isDark ? "border-blue-900/50" : ""}>
@@ -55,22 +98,12 @@ const StakingStats = ({ stakedTokens }: StakingStatsProps) => {
             <div className="mt-4 pt-4 border-t">
               <div className="text-sm">Staked assets breakdown:</div>
               <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                <div className="flex items-center p-1.5 rounded bg-primary/5">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
-                  <span>Real Estate: 60%</span>
-                </div>
-                <div className="flex items-center p-1.5 rounded bg-primary/5">
-                  <div className="w-2 h-2 rounded-full bg-amber-500 mr-2"></div>
-                  <span>Private Credit: 25%</span>
-                </div>
-                <div className="flex items-center p-1.5 rounded bg-primary/5">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                  <span>Entertainment: 10%</span>
-                </div>
-                <div className="flex items-center p-1.5 rounded bg-primary/5">
-                  <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
-                  <span>Other RWAs: 5%</span>
-                </div>
+                {sortedCategories.map(({ category, percentage, color }) => (
+                  <div key={category} className="flex items-center p-1.5 rounded bg-primary/5">
+                    <div className={`w-2 h-2 rounded-full bg-${color} mr-2`}></div>
+                    <span>{category}: {percentage.toFixed(0)}%</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -148,5 +181,23 @@ const StakingStats = ({ stakedTokens }: StakingStatsProps) => {
     </div>
   );
 };
+
+// Helper function to assign colors based on category
+function getCategoryColor(category: string): string {
+  switch (category) {
+    case "Real Estate":
+      return "blue-500";
+    case "Entertainment":
+      return "green-500";
+    case "Commodity":
+      return "amber-500";
+    case "Private Credit":
+      return "red-500";
+    case "Native Token":
+      return "indigo-500";
+    default:
+      return "purple-500";
+  }
+}
 
 export default StakingStats;
