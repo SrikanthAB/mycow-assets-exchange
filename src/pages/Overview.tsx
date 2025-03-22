@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { PieChart, HistoryIcon, WalletIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "@/components/ui/theme-provider";
 
 // Import the component files
 import PortfolioSection from "@/components/overview/PortfolioSection";
@@ -11,10 +12,10 @@ import WalletSection from "@/components/overview/WalletSection";
 import TransactionHistory from "@/components/overview/TransactionHistory";
 
 const Overview = () => {
-  console.log("Rendering Overview page");
+  const { theme } = useTheme();
   
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'}`}>
       <Navbar />
       
       <main className="pt-24 pb-16">
@@ -28,16 +29,25 @@ const Overview = () => {
             </div>
             
             <Tabs defaultValue="portfolio" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
-                <TabsTrigger value="portfolio" className="flex items-center gap-2">
+              <TabsList className={`grid w-full grid-cols-3 mb-8 ${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30' : ''}`}>
+                <TabsTrigger 
+                  value="portfolio" 
+                  className={`flex items-center gap-2 ${theme === 'dark' ? 'data-[state=active]:bg-[#0f172a] data-[state=active]:text-white hover:bg-[#0f172a]/80' : ''}`}
+                >
                   <PieChart size={16} />
                   <span>Portfolio</span>
                 </TabsTrigger>
-                <TabsTrigger value="wallet" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="wallet" 
+                  className={`flex items-center gap-2 ${theme === 'dark' ? 'data-[state=active]:bg-[#0f172a] data-[state=active]:text-white hover:bg-[#0f172a]/80' : ''}`}
+                >
                   <WalletIcon size={16} />
                   <span>Wallet</span>
                 </TabsTrigger>
-                <TabsTrigger value="history" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="history" 
+                  className={`flex items-center gap-2 ${theme === 'dark' ? 'data-[state=active]:bg-[#0f172a] data-[state=active]:text-white hover:bg-[#0f172a]/80' : ''}`}
+                >
                   <HistoryIcon size={16} />
                   <span>History</span>
                 </TabsTrigger>

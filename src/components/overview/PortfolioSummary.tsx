@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/contexts/portfolio/usePortfolio";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTheme } from "@/components/ui/theme-provider";
 
 interface PortfolioSummaryProps {
   totalValue: number;
@@ -12,14 +13,15 @@ interface PortfolioSummaryProps {
 const PortfolioSummary = ({ totalValue }: PortfolioSummaryProps) => {
   const { getAvailablePortfolioValue } = usePortfolio();
   const availableValue = getAvailablePortfolioValue();
+  const { theme } = useTheme();
   
   return (
-    <div className="bg-[#0f172a] border border-blue-900/30 rounded-xl p-6 mb-8 shadow-sm">
+    <div className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border'} rounded-xl p-6 mb-8 shadow-sm`}>
       <div className="flex flex-col md:flex-row md:items-end justify-between">
         <div className="space-y-3">
           <div>
             <h3 className="text-muted-foreground text-sm font-medium">Total Portfolio Value</h3>
-            <div className="text-3xl font-bold mt-1 text-white">₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+            <div className={`text-3xl font-bold mt-1 ${theme === 'dark' ? 'text-white' : ''}`}>₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
           </div>
           
           {availableValue < totalValue && (
@@ -42,7 +44,12 @@ const PortfolioSummary = ({ totalValue }: PortfolioSummaryProps) => {
           )}
         </div>
         <div className="mt-4 md:mt-0">
-          <Button variant="outline" className="bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white">Export Report</Button>
+          <Button 
+            variant="outline" 
+            className={`${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white' : ''}`}
+          >
+            Export Report
+          </Button>
         </div>
       </div>
     </div>

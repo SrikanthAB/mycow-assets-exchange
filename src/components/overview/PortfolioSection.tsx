@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import PortfolioSummary from "./PortfolioSummary";
 import AssetCard from "./AssetCard";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useTheme } from "@/components/ui/theme-provider";
 
 // Categories for filtering assets
 const categories = [
@@ -21,6 +22,7 @@ const PortfolioSection = () => {
   const { tokens, getTotalPortfolioValue } = usePortfolio();
   const totalValue = getTotalPortfolioValue();
   const [activeCategory, setActiveCategory] = React.useState("All Assets");
+  const { theme } = useTheme();
   
   // Filter tokens by category
   const filteredTokens = activeCategory === "All Assets" 
@@ -38,13 +40,15 @@ const PortfolioSection = () => {
         </p>
         
         {tokens.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl p-6 shadow-sm">
+          <div className={`text-center py-12 ${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white'} rounded-xl p-6 shadow-sm`}>
             <p className="text-muted-foreground">You don't have any assets yet.</p>
-            <Button className="mt-4">Browse Markets</Button>
+            <Button className={`mt-4 ${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white' : ''}`}>
+              Browse Markets
+            </Button>
           </div>
         ) : (
           <Tabs defaultValue="All Assets" className="animate-fade-in">
-            <div className="mb-8 border-b border-border overflow-x-auto pb-1">
+            <div className={`mb-8 border-b ${theme === 'dark' ? 'border-blue-900/30' : 'border-border'} overflow-x-auto pb-1`}>
               <TabsList className="bg-transparent h-auto p-0 space-x-6">
                 {categories.map((category) => (
                   <TabsTrigger 

@@ -1,12 +1,15 @@
 
 import { Token } from "@/contexts/portfolio";
 import SwapForm from "./SwapForm";
+import { useTheme } from "@/components/ui/theme-provider";
 
 interface SwapSectionProps {
   tokens: Token[];
 }
 
 const SwapSection = ({ tokens }: SwapSectionProps) => {
+  const { theme } = useTheme();
+  
   return (
     <section className="py-8 md:py-12">
       <div className="container mx-auto px-4">
@@ -18,7 +21,9 @@ const SwapSection = ({ tokens }: SwapSectionProps) => {
         </div>
         
         <div className="max-w-md mx-auto">
-          <SwapForm tokens={tokens} />
+          <div className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border'} rounded-xl shadow-sm p-6`}>
+            <SwapForm tokens={tokens} />
+          </div>
         </div>
       </div>
     </section>

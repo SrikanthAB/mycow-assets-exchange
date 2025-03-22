@@ -2,83 +2,96 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useToast } from "@/components/ui/use-toast";
-import { usePortfolio } from "@/contexts/portfolio";
-import StakeTokenModal from "@/components/StakeTokenModal";
+import { useTheme } from "@/components/ui/theme-provider";
+import { usePortfolio } from "@/contexts/portfolio/usePortfolio";
+import { Token } from "@/contexts/portfolio";
 import StakingHeader from "@/components/staking/StakingHeader";
-import StakingStats from "@/components/staking/StakingStats";
 import YieldStrategiesSection from "@/components/staking/YieldStrategiesSection";
 import ProjectedGrowthCard from "@/components/staking/ProjectedGrowthCard";
+import StakingStats from "@/components/staking/StakingStats";
+import StakeTokenModal from "@/components/StakeTokenModal";
 
+// Placeholder data for yield strategies
 const yieldStrategies = [
   {
-    id: "conservative",
+    id: "strategy-1",
     name: "Conservative",
-    description: "Low-risk investments with stable returns",
-    expectedReturn: "5-7% APY",
-    assets: ["Residential REIT", "Gold", "Stablecoins"],
+    description: "Lower risk investments focusing on stable assets with regular payouts",
+    expectedReturn: "5-8%",
+    assets: ["Real Estate", "Commodities", "Stablecoins"],
     risk: "Low"
   },
   {
-    id: "balanced",
+    id: "strategy-2",
     name: "Balanced",
-    description: "Medium-risk investments with moderate returns",
-    expectedReturn: "8-12% APY",
-    assets: ["Commercial REIT", "Private Credit", "MyCow Token"],
+    description: "Diversified portfolio with a mix of stable and growth assets",
+    expectedReturn: "8-12%",
+    assets: ["Real Estate", "Entertainment", "Native Tokens"],
     risk: "Medium"
   },
   {
-    id: "aggressive",
-    name: "Aggressive",
-    description: "Higher-risk investments with potential for higher returns",
-    expectedReturn: "13-20% APY",
-    assets: ["Entertainment Funds", "Development REIT", "Startup Equity"],
+    id: "strategy-3",
+    name: "Growth",
+    description: "Focus on high growth potential assets with higher volatility",
+    expectedReturn: "12-20%",
+    assets: ["Private Credit", "Entertainment", "Native Tokens"],
     risk: "High"
   }
 ];
 
 const Staking = () => {
+  const { theme } = useTheme();
   const { tokens } = usePortfolio();
-  const [selectedStrategy, setSelectedStrategy] = useState("balanced");
-  const [selectedToken, setSelectedToken] = useState<any>(null);
   const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
+  const [selectedToken, setSelectedToken] = useState<Token | null>(null);
+  const [selectedStrategy, setSelectedStrategy] = useState(yieldStrategies[0].id);
   
-  const stakedTokens = tokens.filter(token => token.balance > 0);
+  // Filter staked tokens
+  const stakedTokens = tokens.filter(token => token.staked);
   
-  const handleStake = (token: any) => {
+  const handleStake = (token: Token) => {
+    setSelectedToken(token);
+    setIsStakeModalOpen(true);
+  };
+  
+  const handleManageStakedToken = (token: Token) => {
     setSelectedToken(token);
     setIsStakeModalOpen(true);
   };
   
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'}`}>
       <Navbar />
       
       <main className="pt-24 pb-16">
         <section className="py-8 md:py-12">
           <div className="container mx-auto px-4">
-            <StakingHeader />
-            <StakingStats />
+            <StakingHeader onStake={() => setIsStakeModalOpen(true)} />
+            
+            <StakingStats stakedTokens={stakedTokens} />
             
             <YieldStrategiesSection 
               strategies={yieldStrategies}
               selectedStrategy={selectedStrategy}
               setSelectedStrategy={setSelectedStrategy}
               stakedTokens={stakedTokens}
-              onManageToken={handleStake}
+              onManageToken={handleManageStakedToken}
             />
             
-            <ProjectedGrowthCard />
+            <ProjectedGrowthCard 
+              stakedTokens={stakedTokens}
+              selectedStrategy={yieldStrategies.find(s => s.id === selectedStrategy)}
+            />
           </div>
         </section>
       </main>
       
-      {selectedToken && (
-        <StakeTokenModal
-          isOpen={isStakeModalOpen}
-          onClose={() => setIsStakeModalOpen(false)}
-          token={selectedToken}
-          strategy={yieldStrategies.find(s => s.id === selectedStrategy)!}
+      {isStakeModalOpen && (
+        <StakeTokenModal 
+          open={isStakeModalOpen}
+          onOpenChange={setIsStakeModalOpen}
+          tokens={tokens.filter(t => !t.staked)}
+          initialToken={selectedToken}
         />
       )}
       
