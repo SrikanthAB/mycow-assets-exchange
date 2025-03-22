@@ -28,14 +28,14 @@ const AssetCard = ({ token }: AssetCardProps) => {
   };
   
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
+    <div className="asset-card glass-effect group hover-elevate bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
       <div className="flex items-start justify-between">
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center overflow-hidden">
             {token.image ? (
               <img src={token.image} alt={token.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-primary/20 flex items-center justify-center text-primary font-medium">
+              <div className="w-full h-full bg-black flex items-center justify-center text-white font-medium">
                 {token.symbol.substring(0, 2)}
               </div>
             )}
