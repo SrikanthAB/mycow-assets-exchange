@@ -9,10 +9,7 @@ const NavLinks: React.FC = () => {
   
   const handleComingSoon = (e: React.MouseEvent, pageName: string) => {
     e.preventDefault();
-    toast({
-      title: "Coming Soon",
-      description: `The ${pageName} page is under development and will be available soon.`,
-    });
+    toast(`The ${pageName} page is under development and will be available soon.`);
   };
   
   return (

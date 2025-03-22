@@ -12,11 +12,7 @@ const Footer = () => {
     if (link.isComingSoon) {
       e.preventDefault();
       // Show toast notification for coming soon pages
-      toast({
-        title: "Coming Soon",
-        description: `The ${link.name} page is under development and will be available soon.`,
-        variant: "default",
-      });
+      toast(`The ${link.name} page is under development and will be available soon.`);
     } else if (link.isExternal && link.url) {
       // External links open in a new tab, no need to prevent default
     } else {
