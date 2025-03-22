@@ -5,10 +5,11 @@ import TokenSelector from "./TokenSelector";
 import { Lock } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTheme } from "@/components/ui/theme-provider";
+import { ChangeEvent } from "react";
 
 interface SwapInputFieldProps {
   amount: number | string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   token: Token | null;
   onTokenChange: (tokenId: string) => void;
   tokens: Token[];

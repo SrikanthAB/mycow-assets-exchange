@@ -41,7 +41,7 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
         
         <SwapInputField
           amount={fromAmount}
-          onChange={handleFromAmountChange}
+          onChange={(e) => handleFromAmountChange(e.target.value)}
           token={fromToken}
           onTokenChange={handleFromTokenChange}
           tokens={tokens}

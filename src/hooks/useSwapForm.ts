@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { Token, usePortfolio } from "@/contexts/portfolio";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -49,7 +49,10 @@ export const useSwapForm = (tokens: Token[]) => {
     }
   };
 
-  const handleFromTokenChange = (token: Token) => {
+  const handleFromTokenChange = (tokenId: string) => {
+    const token = tokens.find(t => t.id === tokenId);
+    if (!token) return;
+    
     if (token.id === toToken?.id) {
       // If same as to token, swap them
       setFromToken(toToken);
@@ -59,7 +62,10 @@ export const useSwapForm = (tokens: Token[]) => {
     }
   };
 
-  const handleToTokenChange = (token: Token) => {
+  const handleToTokenChange = (tokenId: string) => {
+    const token = tokens.find(t => t.id === tokenId);
+    if (!token) return;
+    
     if (token.id === fromToken?.id) {
       // If same as from token, swap them
       setToToken(fromToken);

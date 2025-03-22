@@ -12,7 +12,7 @@ import {
 interface TokenSelectorProps {
   tokens: Token[];
   selectedToken: Token | null;
-  onChange: (tokenId: string) => void;
+  onChange: (token: string) => void;
   label: string;
   balance?: boolean;
 }
