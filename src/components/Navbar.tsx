@@ -1,11 +1,12 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Moon as MoonIcon, Sun as SunIcon } from "lucide-react";
+import { Moon as MoonIcon, Sun as SunIcon, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth";
 import { useTheme } from "@/components/ui/theme-provider";
 import UserProfileModal from "./UserProfileModal";
+import SupportChatbot from "./SupportChatbot";
 
 interface HeaderLinkProps {
   to: string;
@@ -25,6 +26,7 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isSupportChatOpen, setIsSupportChatOpen] = useState(false);
   
   const toggleMobileNav = () => {
     setIsMobileNavOpen(!isMobileNavOpen);
@@ -46,6 +48,10 @@ const Navbar = () => {
     if (user) {
       setIsProfileModalOpen(true);
     }
+  };
+  
+  const openSupportChat = () => {
+    setIsSupportChatOpen(true);
   };
   
   return (
@@ -91,9 +97,22 @@ const Navbar = () => {
             </Button>
             
             {user ? (
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={openSupportChat}
+                  aria-label="Support"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <HelpCircle className="h-5 w-5" />
+                  <span className="sr-only">Support</span>
+                </Button>
+                
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
             ) : (
               <>
                 <Link to="/login">
@@ -136,9 +155,20 @@ const Navbar = () => {
             <HeaderLink to="/staking">Staking</HeaderLink>
             
             {user ? (
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={openSupportChat}
+                  className="flex items-center justify-start"
+                >
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  Support
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
             ) : (
               <>
                 <Link to="/login">
@@ -159,6 +189,12 @@ const Navbar = () => {
       <UserProfileModal 
         open={isProfileModalOpen} 
         onClose={() => setIsProfileModalOpen(false)} 
+      />
+      
+      {/* Support Chatbot */}
+      <SupportChatbot
+        open={isSupportChatOpen}
+        onClose={() => setIsSupportChatOpen(false)}
       />
     </header>
   );
