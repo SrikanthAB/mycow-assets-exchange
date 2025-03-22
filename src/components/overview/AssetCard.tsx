@@ -1,8 +1,9 @@
 
 import React from "react";
-import { Token } from "@/contexts/PortfolioContext";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { Token } from "@/contexts/portfolio/types";
+import { TrendingUp, TrendingDown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AssetCardProps {
   token: Token;
@@ -11,6 +12,8 @@ interface AssetCardProps {
 const AssetCard = ({ token }: AssetCardProps) => {
   const isPositiveChange = token.change >= 0;
   const tokenValue = token.price * token.balance;
+  const availableBalance = token.locked && token.lockedAmount ? token.balance - token.lockedAmount : token.balance;
+  const availableValue = token.price * availableBalance;
   
   return (
     <div className="bg-background rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
@@ -26,7 +29,21 @@ const AssetCard = ({ token }: AssetCardProps) => {
             )}
           </div>
           <div className="ml-3">
-            <h4 className="font-medium">{token.name}</h4>
+            <div className="flex items-center">
+              <h4 className="font-medium">{token.name}</h4>
+              {token.locked && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Lock size={16} className="ml-2 text-amber-500" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{token.lockedAmount} {token.symbol} locked as collateral</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
             <div className="text-xs text-muted-foreground flex items-center">
               <span className="bg-secondary px-1.5 py-0.5 rounded text-xs mr-2">{token.category}</span>
               <span>{token.symbol}</span>
@@ -37,6 +54,11 @@ const AssetCard = ({ token }: AssetCardProps) => {
         <div className="text-right">
           <div className="text-sm font-medium">Balance</div>
           <div>{token.balance.toLocaleString('en-IN', { maximumFractionDigits: 4 })} {token.symbol}</div>
+          {token.locked && (
+            <div className="text-xs text-amber-500">
+              ({availableBalance.toLocaleString('en-IN', { maximumFractionDigits: 4 })} available)
+            </div>
+          )}
         </div>
       </div>
       
@@ -44,6 +66,11 @@ const AssetCard = ({ token }: AssetCardProps) => {
         <div>
           <div className="text-sm text-muted-foreground">Current Value</div>
           <div className="text-xl font-semibold">₹{tokenValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+          {token.locked && (
+            <div className="text-xs text-amber-500">
+              (₹{availableValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })} available)
+            </div>
+          )}
           <div 
             className={cn(
               "flex items-center text-sm",
