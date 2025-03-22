@@ -50,8 +50,8 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
     }
   };
   
-  const handleFromTokenChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = tokens.find(t => t.id === e.target.value) || null;
+  const handleFromTokenChange = (tokenId: string) => {
+    const selected = tokens.find(t => t.id === tokenId) || null;
     setFromToken(selected);
     
     // Don't allow same token to be selected for both fields
@@ -61,8 +61,8 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
     }
   };
   
-  const handleToTokenChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = tokens.find(t => t.id === e.target.value) || null;
+  const handleToTokenChange = (tokenId: string) => {
+    const selected = tokens.find(t => t.id === tokenId) || null;
     setToToken(selected);
     
     // Don't allow same token to be selected for both fields
