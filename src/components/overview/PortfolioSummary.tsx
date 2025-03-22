@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { usePortfolio } from "@/contexts/portfolio";
+import { usePortfolio } from "@/contexts/portfolio/usePortfolio";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
