@@ -6,12 +6,14 @@ import SwapInputField from "./SwapInputField";
 import TokenSwitcher from "./TokenSwitcher";
 import SwapButton from "./SwapButton";
 import { useSwapForm } from "@/hooks/useSwapForm";
+import { useTheme } from "@/components/ui/theme-provider";
 
 interface SwapFormProps {
   tokens: Token[];
 }
 
 const SwapForm = ({ tokens }: SwapFormProps) => {
+  const { theme } = useTheme();
   const {
     fromToken,
     toToken,
@@ -28,7 +30,7 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
   } = useSwapForm(tokens);
   
   return (
-    <div className="bg-[#0f172a] border border-blue-900/30 rounded-xl shadow-sm p-6">
+    <div className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border border-gray-200'} rounded-xl shadow-sm p-6`}>
       <div className="mb-6">
         <TokenSelector 
           tokens={tokens}
