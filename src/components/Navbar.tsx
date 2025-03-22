@@ -1,28 +1,19 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Moon as MoonIcon, Sun as SunIcon, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth";
-import { useTheme } from "@/components/ui/theme-provider";
 import UserProfileModal from "./UserProfileModal";
 import SupportChatbot from "./SupportChatbot";
 
-interface HeaderLinkProps {
-  to: string;
-  children: React.ReactNode;
-}
-
-const HeaderLink: React.FC<HeaderLinkProps> = ({ to, children }) => {
-  return (
-    <Link to={to} className="text-sm font-medium hover:text-primary transition-colors">
-      {children}
-    </Link>
-  );
-};
+// Import our new components
+import HeaderLink from "./navbar/HeaderLink";
+import ThemeToggle from "./navbar/ThemeToggle";
+import SupportChatButton from "./navbar/SupportChatButton";
+import MobileNavigation from "./navbar/MobileNavigation";
+import NavLinks from "./navbar/NavLinks";
 
 const Navbar = () => {
-  const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -36,12 +27,6 @@ const Navbar = () => {
     if (signOut) {
       signOut();
     }
-  };
-  
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    console.log("Toggling theme to:", newTheme);
-    setTheme(newTheme);
   };
   
   const openProfileModal = () => {
@@ -71,47 +56,15 @@ const Navbar = () => {
               <span className="font-semibold text-xl">MyCow</span>
             </div>
             
-            <nav className="hidden md:flex items-center ml-8 space-x-6">
-              <HeaderLink to="/">Home</HeaderLink>
-              <HeaderLink to="/markets">Markets</HeaderLink>
-              <HeaderLink to="/overview">Overview</HeaderLink>
-              <HeaderLink to="/swaps">Swaps</HeaderLink>
-              <HeaderLink to="/ibpls">IBPLs</HeaderLink>
-              <HeaderLink to="/staking">Staking</HeaderLink>
-            </nav>
+            <NavLinks />
           </div>
           
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-            >
-              {theme === "light" ? (
-                <MoonIcon className="h-[1.2rem] w-[1.2rem]" />
-              ) : (
-                <SunIcon className="h-[1.2rem] w-[1.2rem]" />
-              )}
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+            <ThemeToggle />
             
             {user ? (
               <>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={openSupportChat}
-                  aria-label="AI Support"
-                  className="text-muted-foreground hover:text-foreground relative"
-                >
-                  <Bot className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                  </span>
-                  <span className="sr-only">AI Support</span>
-                </Button>
+                <SupportChatButton onClick={openSupportChat} />
                 
                 <Button variant="outline" size="sm" onClick={handleLogout}>
                   Logout
@@ -148,46 +101,12 @@ const Navbar = () => {
         </div>
       </div>
       
-      {isMobileNavOpen && (
-        <div className="md:hidden bg-background border-b border-border">
-          <nav className="flex flex-col p-4 space-y-3">
-            <HeaderLink to="/">Home</HeaderLink>
-            <HeaderLink to="/markets">Markets</HeaderLink>
-            <HeaderLink to="/overview">Overview</HeaderLink>
-            <HeaderLink to="/swaps">Swaps</HeaderLink>
-            <HeaderLink to="/ibpls">IBPLs</HeaderLink>
-            <HeaderLink to="/staking">Staking</HeaderLink>
-            
-            {user ? (
-              <>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={openSupportChat}
-                  className="flex items-center justify-start"
-                >
-                  <Bot className="h-4 w-4 mr-2" />
-                  AI Support
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleLogout}>
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link to="/login">
-                  <Button variant="outline" size="sm">
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button size="sm">Sign Up</Button>
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      )}
+      <MobileNavigation 
+        isOpen={isMobileNavOpen}
+        user={user}
+        openSupportChat={openSupportChat}
+        handleLogout={handleLogout}
+      />
       
       {/* User Profile Modal */}
       <UserProfileModal 
