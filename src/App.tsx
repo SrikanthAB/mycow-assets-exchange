@@ -15,6 +15,7 @@ import Swaps from './pages/Swaps';
 import IBPLs from './pages/IBPLs';
 import NotFound from './pages/NotFound';
 import Staking from './pages/Staking';
+import Funding from './pages/Funding';
 
 // Import contexts
 import { AuthProvider } from './contexts/auth';
@@ -40,6 +41,7 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/markets" element={<Markets />} />
                   <Route path="/staking" element={<Staking />} />
+                  <Route path="/funding" element={<Funding />} />
                   
                   {/* Protected Routes */}
                   <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>

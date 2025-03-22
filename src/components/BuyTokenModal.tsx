@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { usePortfolio } from "@/contexts/PortfolioContext";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Wallet, CreditCard, Smartphone } from "lucide-react";
 
 interface BuyTokenModalProps {
   isOpen: boolean;
@@ -16,27 +18,53 @@ interface BuyTokenModalProps {
     price: string;
     numericPrice: number;
     category: string;
-    yield?: string; // Make yield optional
+    yield?: string;
   };
 }
 
 const BuyTokenModal = ({ isOpen, onClose, asset }: BuyTokenModalProps) => {
   const [amount, setAmount] = useState<number>(1);
-  const [paymentMethod, setPaymentMethod] = useState<string>("upi");
+  const [paymentMethod, setPaymentMethod] = useState<string>("wallet");
   const [upiId, setUpiId] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const { toast } = useToast();
-  const { addToken, tokens, updateTokenBalance } = usePortfolio();
+  const { addToken, tokens, updateTokenBalance, walletBalance, deductFunds } = usePortfolio();
   
   const totalCost = amount * asset.numericPrice;
+  const isWalletSufficient = walletBalance >= totalCost;
   
   const handlePurchase = () => {
-    if (!amount || amount <= 0 || !upiId) return;
+    if (!amount || amount <= 0) return;
+    
+    // If using wallet, check if there are sufficient funds
+    if (paymentMethod === "wallet" && !isWalletSufficient) {
+      toast({
+        title: "Insufficient funds",
+        description: "You don't have enough funds in your wallet for this purchase.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // If using UPI, check if UPI ID is provided
+    if (paymentMethod === "upi" && !upiId) {
+      toast({
+        title: "UPI ID required",
+        description: "Please enter your UPI ID to proceed with the payment.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setIsProcessing(true);
     
     // Simulate transaction processing
     setTimeout(() => {
+      // If using wallet, deduct funds
+      if (paymentMethod === "wallet") {
+        deductFunds(totalCost);
+      }
+      
       // Check if token already exists in portfolio
       const existingToken = tokens.find(t => t.id === asset.id);
       
@@ -54,7 +82,7 @@ const BuyTokenModal = ({ isOpen, onClose, asset }: BuyTokenModalProps) => {
           priceString: asset.price,
           change: 0, // Default change value
           balance: amount,
-          yield: asset.yield // Now this is properly typed as optional
+          yield: asset.yield
         });
       }
       
@@ -78,7 +106,7 @@ const BuyTokenModal = ({ isOpen, onClose, asset }: BuyTokenModalProps) => {
         <DialogHeader>
           <DialogTitle>Buy {asset.name}</DialogTitle>
           <DialogDescription>
-            Purchase {asset.symbol} tokens using UPI payment.
+            Purchase {asset.symbol} tokens using your preferred payment method.
           </DialogDescription>
         </DialogHeader>
         
@@ -110,27 +138,67 @@ const BuyTokenModal = ({ isOpen, onClose, asset }: BuyTokenModalProps) => {
           
           <div>
             <label className="text-sm font-medium mb-2 block">Payment Method</label>
-            <select 
-              className="w-full h-10 rounded-md border border-input bg-background px-3 py-2"
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            >
-              <option value="upi">UPI</option>
-              <option value="netbanking" disabled>Net Banking</option>
-              <option value="card" disabled>Credit/Debit Card</option>
-            </select>
+            <Tabs value={paymentMethod} onValueChange={setPaymentMethod} className="w-full">
+              <TabsList className="grid grid-cols-3 w-full">
+                <TabsTrigger value="wallet" className="flex items-center gap-1">
+                  <Wallet className="h-4 w-4" />
+                  Wallet
+                </TabsTrigger>
+                <TabsTrigger value="upi" className="flex items-center gap-1">
+                  <Smartphone className="h-4 w-4" />
+                  UPI
+                </TabsTrigger>
+                <TabsTrigger value="card" className="flex items-center gap-1">
+                  <CreditCard className="h-4 w-4" />
+                  Card
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="wallet" className="mt-4">
+                <div className="p-3 bg-muted/30 rounded-md">
+                  <div className="flex justify-between mb-2">
+                    <span>Wallet Balance</span>
+                    <span className="font-medium">₹{walletBalance.toLocaleString('en-IN')}</span>
+                  </div>
+                  {!isWalletSufficient && (
+                    <div className="text-red-500 text-sm mt-1">
+                      Insufficient funds. Please add more funds to your wallet or use another payment method.
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="upi" className="mt-4">
+                <div className="space-y-3">
+                  <label className="text-sm font-medium mb-2 block">UPI ID</label>
+                  <Input
+                    placeholder="name@upi"
+                    value={upiId}
+                    onChange={(e) => setUpiId(e.target.value)}
+                  />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="card" className="mt-4">
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Card Number</label>
+                    <Input placeholder="1234 5678 9012 3456" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Expiry</label>
+                      <Input placeholder="MM/YY" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">CVV</label>
+                      <Input type="password" placeholder="123" />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
-          
-          {paymentMethod === "upi" && (
-            <div>
-              <label className="text-sm font-medium mb-2 block">UPI ID</label>
-              <Input
-                placeholder="name@upi"
-                value={upiId}
-                onChange={(e) => setUpiId(e.target.value)}
-              />
-            </div>
-          )}
         </div>
         
         <div className="flex justify-end gap-2">
@@ -139,7 +207,12 @@ const BuyTokenModal = ({ isOpen, onClose, asset }: BuyTokenModalProps) => {
           </Button>
           <Button 
             onClick={handlePurchase} 
-            disabled={!amount || amount <= 0 || !upiId || isProcessing}
+            disabled={
+              (paymentMethod === "wallet" && !isWalletSufficient) || 
+              (paymentMethod === "upi" && !upiId) || 
+              !amount || amount <= 0 || 
+              isProcessing
+            }
             className={isProcessing ? "opacity-80" : ""}
           >
             {isProcessing ? "Processing..." : "Buy Now"}
