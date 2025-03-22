@@ -99,7 +99,9 @@ const StakedTokensCard = ({ stakedTokens, onManageToken }: StakedTokensCardProps
                   </div>
                   
                   <div className="flex items-center text-sm mt-1">
-                    <span className="text-green-500 font-medium mr-1">{token.yield}</span>
+                    <span className="text-green-500 font-medium mr-1">
+                      {token.yield || "0% APY"}
+                    </span>
                     <Sparkle size={14} className="text-amber-500" />
                   </div>
                 </div>

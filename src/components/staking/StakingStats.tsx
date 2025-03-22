@@ -59,7 +59,7 @@ const StakingStats = ({ stakedTokens }: StakingStatsProps) => {
       color: getCategoryColor(category)
     }));
   
-  // If there are fewer than 4 categories, add an "Other" category
+  // If there are more than 4 categories, add an "Other" category
   if (sortedCategories.length > 4) {
     const topCategories = sortedCategories.slice(0, 3);
     const otherPercentage = sortedCategories.slice(3).reduce((sum, item) => sum + item.percentage, 0);
