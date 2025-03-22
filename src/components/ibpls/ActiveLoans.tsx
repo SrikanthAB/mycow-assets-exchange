@@ -26,49 +26,57 @@ const ActiveLoans = ({ loans, tokens, onRepayLoan }: ActiveLoansProps) => {
         </div>
       ) : (
         <div className="space-y-4">
-          {activeLoans.map(loan => (
-            <div key={loan.id} className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border'} rounded-xl shadow-sm p-6`}>
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <Badge variant="outline" className="mb-2">Active</Badge>
-                  <h4 className="text-lg font-medium">₹{loan.amount.toLocaleString('en-IN')}</h4>
-                  <p className="text-sm text-muted-foreground">{loan.remainingDays} days remaining</p>
+          {activeLoans.map(loan => {
+            // Ensure loan properties have default values to prevent null errors
+            const collateralValue = loan.collateralValue || 0;
+            const collateralRatio = loan.collateralRatio || 0;
+            const interestRate = loan.interestRate || 0;
+            const remainingDays = loan.remainingDays || 0;
+            
+            return (
+              <div key={loan.id} className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border'} rounded-xl shadow-sm p-6`}>
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <Badge variant="outline" className="mb-2">Active</Badge>
+                    <h4 className="text-lg font-medium">₹{loan.amount.toLocaleString('en-IN')}</h4>
+                    <p className="text-sm text-muted-foreground">{remainingDays} days remaining</p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className={`${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white' : ''}`}
+                    onClick={() => onRepayLoan(loan.id)}
+                  >
+                    Repay Loan <ArrowRight className="ml-1 w-4 h-4" />
+                  </Button>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className={`${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white' : ''}`}
-                  onClick={() => onRepayLoan(loan.id)}
-                >
-                  Repay Loan <ArrowRight className="ml-1 w-4 h-4" />
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Collateral</p>
-                  <div className="flex items-center">
-                    <p>
-                      {tokens.find(t => t.id === loan.collateralToken)?.name || loan.collateralToken}
-                    </p>
-                    <Lock size={14} className="ml-2 text-amber-500" />
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Collateral</p>
+                    <div className="flex items-center">
+                      <p>
+                        {tokens.find(t => t.id === loan.collateralToken)?.name || loan.collateralToken}
+                      </p>
+                      <Lock size={14} className="ml-2 text-amber-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Collateral Value</p>
+                    <p>₹{collateralValue.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Collateral Ratio</p>
+                    <p>{collateralRatio}%</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Interest Rate</p>
+                    <p>{interestRate}%</p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-muted-foreground">Collateral Value</p>
-                  <p>₹{loan.collateralValue.toLocaleString('en-IN')}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Collateral Ratio</p>
-                  <p>{loan.collateralRatio}%</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Interest Rate</p>
-                  <p>{loan.interestRate}%</p>
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       

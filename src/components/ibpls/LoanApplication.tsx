@@ -26,8 +26,13 @@ const LoanApplication = ({
   
   const [loanAmount, setLoanAmount] = useState<number>(0);
   const [collateralRatio, setCollateralRatio] = useState<number>(150);
-  const [selectedToken, setSelectedToken] = useState<string>(tokens.filter(t => !t.locked)[0]?.id || "");
+  const [selectedToken, setSelectedToken] = useState<string>("");
   const [loanTerm, setLoanTerm] = useState<number>(30);
+  
+  // Set initial token if available and not already set
+  if (selectedToken === "" && tokens.filter(t => !t.locked).length > 0) {
+    setSelectedToken(tokens.filter(t => !t.locked)[0]?.id || "");
+  }
   
   // Get only unlocked tokens for selection
   const availableTokens = tokens.filter(t => !t.locked);
@@ -40,7 +45,21 @@ const LoanApplication = ({
   const requiredCollateral = (loanAmount * collateralRatio) / 100;
   const hasEnoughCollateral = selectedTokenValue >= requiredCollateral;
   const interestRate = 9.5 + (150 - collateralRatio) * 0.05; // Base rate of 9.5%, increases as collateral ratio decreases
-  const monthlyPayment = loanAmount * (interestRate/100/12) / (1 - Math.pow(1 + interestRate/100/12, -loanTerm));
+  
+  // Add defensive coding for monthlyPayment calculation
+  let monthlyPayment = 0;
+  if (loanAmount > 0 && interestRate > 0 && loanTerm > 0) {
+    try {
+      monthlyPayment = loanAmount * (interestRate/100/12) / (1 - Math.pow(1 + interestRate/100/12, -loanTerm));
+      // Check for NaN or Infinity
+      if (isNaN(monthlyPayment) || !isFinite(monthlyPayment)) {
+        monthlyPayment = 0;
+      }
+    } catch (error) {
+      console.error("Error calculating monthly payment:", error);
+      monthlyPayment = 0;
+    }
+  }
   
   const handleApplyForLoan = () => {
     if (loanAmount <= 0 || loanAmount > maxLoanAmount) return;
@@ -188,7 +207,7 @@ const LoanApplication = ({
           {loanTerm >= 30 && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">Est. Monthly Payment</span>
-              <span className="font-medium">₹{isNaN(monthlyPayment) ? "0" : monthlyPayment.toLocaleString('en-IN', {maximumFractionDigits: 0})}</span>
+              <span className="font-medium">₹{monthlyPayment.toLocaleString('en-IN', {maximumFractionDigits: 0})}</span>
             </div>
           )}
         </div>

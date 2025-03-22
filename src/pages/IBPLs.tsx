@@ -17,13 +17,15 @@ const IBPLs = () => {
   
   const [isLoading, setIsLoading] = useState(true);
   
-  // Calculate already used collateral value
+  // Calculate already used collateral value - add defensive coding
   const usedCollateralValue = loans
     .filter(loan => loan.status === 'active')
-    .reduce((total, loan) => total + loan.collateralValue, 0);
+    .reduce((total, loan) => total + (loan.collateralValue || 0), 0);
   
   // Calculate available portfolio value by subtracting used collateral
-  const availablePortfolioValue = getAvailablePortfolioValue() - usedCollateralValue;
+  // Add safety checks to prevent null/undefined values
+  const portfolioValue = getAvailablePortfolioValue() || 0;
+  const availablePortfolioValue = Math.max(0, portfolioValue - usedCollateralValue);
   
   // Max loan amount should be 66% of available portfolio value
   const maxLoanAmount = availablePortfolioValue * 0.66;
