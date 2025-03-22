@@ -3,11 +3,7 @@ import { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/auth";
 
-interface ProtectedRouteProps {
-  children?: React.ReactNode;
-}
-
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+const ProtectedRoute = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -17,7 +13,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }
   }, [user, loading, navigate]);
 
-  // Show nothing while checking authentication
+  // Show a loading indicator while checking authentication
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -26,8 +22,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  // If not loading and we have a user, render the children or Outlet
-  return user ? <>{children || <Outlet />}</> : null;
+  // If authenticated, render the child routes
+  return user ? <Outlet /> : null;
 };
 
 export default ProtectedRoute;

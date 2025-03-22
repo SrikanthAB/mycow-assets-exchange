@@ -19,7 +19,7 @@ import Funding from './pages/Funding';
 
 // Import contexts
 import { AuthProvider } from './contexts/auth';
-import { PortfolioProvider } from './contexts/PortfolioContext';
+import { PortfolioProvider } from './contexts/portfolio';
 
 // Import components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -44,7 +44,7 @@ function App() {
                   <Route path="/funding" element={<Funding />} />
                   
                   {/* Protected Routes */}
-                  <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
+                  <Route element={<ProtectedRoute />}>
                     <Route path="/overview" element={<Overview />} />
                     <Route path="/swaps" element={<Swaps />} />
                     <Route path="/ibpls" element={<IBPLs />} />
