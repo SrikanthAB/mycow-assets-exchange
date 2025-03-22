@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bot, User } from 'lucide-react';
+import { Bot, User, ChevronRight } from 'lucide-react';
 import { Message } from './types';
 import { Button } from "@/components/ui/button";
 
@@ -44,18 +44,19 @@ const MessageBubble = ({ message, onOptionSelected, formatTime }: MessageBubbleP
         </div>
       </div>
       
-      {/* Options buttons */}
+      {/* Options buttons in a single column */}
       {message.isOption && message.options && message.options.length > 0 && (
-        <div className="flex flex-wrap gap-2 pl-8">
+        <div className="flex flex-col space-y-2 pl-8 pr-2 mt-2">
           {message.options.map((option) => (
             <Button
               key={option.id}
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="text-sm justify-between font-normal text-left px-4 py-2 h-auto"
               onClick={() => onOptionSelected(option.id, option.text)}
             >
-              {option.text}
+              <span>{option.text}</span>
+              <ChevronRight className="h-4 w-4 ml-2 flex-shrink-0" />
             </Button>
           ))}
         </div>
