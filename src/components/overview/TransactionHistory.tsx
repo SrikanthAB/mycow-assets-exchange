@@ -25,6 +25,10 @@ const TransactionHistory = () => {
   const { transactions, isLoading } = usePortfolio();
   const { toast } = useToast();
 
+  useEffect(() => {
+    console.log("Loaded transactions:", transactions);
+  }, [transactions]);
+
   const downloadStatement = () => {
     toast({
       title: "Statement Downloaded",
@@ -63,9 +67,9 @@ const TransactionHistory = () => {
   };
 
   // Sort transactions by date (newest first)
-  const sortedTransactions = [...transactions].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const sortedTransactions = transactions?.length > 0 
+    ? [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    : [];
 
   return (
     <Card>

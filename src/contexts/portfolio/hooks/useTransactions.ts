@@ -132,20 +132,23 @@ export const useTransactions = () => {
 
   // Add transaction to history and save to Supabase
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
-    const newTransaction: Transaction = {
-      ...transaction,
-      id: Date.now().toString(),
-      date: new Date().toISOString(),
-    };
-    
-    // Add to local state first for immediate UI update
-    setTransactions(prev => [newTransaction, ...prev]);
-    
-    // Then save to Supabase
     try {
+      // First save to Supabase to ensure it gets stored in the database
       await saveTransaction(transaction);
+      
+      // Then add to local state for immediate UI update
+      const newTransaction: Transaction = {
+        ...transaction,
+        id: Date.now().toString(), // This will be overwritten when we fetch again from the server
+        date: new Date().toISOString(),
+      };
+      
+      setTransactions(prev => [newTransaction, ...prev]);
+      
+      console.log('Transaction added successfully:', newTransaction);
     } catch (error) {
       console.error('Error in addTransaction:', error);
+      throw error; // Re-throw to allow handling in UI components
     }
   };
 

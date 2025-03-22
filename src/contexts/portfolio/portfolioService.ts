@@ -53,6 +53,9 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
       throw new Error('User must be authenticated to save transactions');
     }
     
+    // Create a current date in ISO format
+    const currentDate = new Date().toISOString();
+    
     const { error } = await supabase
       .from('transactions')
       .insert({
@@ -62,7 +65,8 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
         value: transaction.value,
         status: transaction.status,
         user_id: user.id, // Add the user_id to the transaction record
-        to_asset: transaction.toAsset // Include the destination asset for swap transactions
+        to_asset: transaction.toAsset, // Include the destination asset for swap transactions
+        date: currentDate // Explicitly set the date
       });
       
     if (error) {
