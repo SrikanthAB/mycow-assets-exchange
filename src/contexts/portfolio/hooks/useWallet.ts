@@ -26,7 +26,7 @@ export const useWallet = () => {
         throw error;
       }
       
-      return data?.wallet_balance !== undefined ? data.wallet_balance : null;
+      return data?.wallet_balance !== undefined ? Number(data.wallet_balance) : null;
     } catch (error) {
       console.error('Error loading wallet balance:', error);
       return null;

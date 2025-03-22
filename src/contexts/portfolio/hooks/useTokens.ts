@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Token } from "../types";
 import { initialTokens } from "../initialData";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 export const useTokens = () => {
   const [tokens, setTokens] = useState<Token[]>(initialTokens);
@@ -27,7 +28,12 @@ export const useTokens = () => {
         throw error;
       }
       
-      return data?.tokens || null;
+      // Convert from Json to Token[] with proper type checking
+      if (data?.tokens && Array.isArray(data.tokens)) {
+        return data.tokens as Token[];
+      }
+      
+      return null;
     } catch (error) {
       console.error('Error loading tokens:', error);
       return null;
@@ -52,11 +58,14 @@ export const useTokens = () => {
         throw selectError;
       }
       
+      // Convert tokens to a format compatible with Supabase's Json type
+      const tokensJson = tokensToSave as unknown as Json;
+      
       if (data) {
         // Update existing record
         const { error } = await supabase
           .from('user_portfolio')
-          .update({ tokens: tokensToSave })
+          .update({ tokens: tokensJson })
           .eq('user_id', user.id);
         
         if (error) throw error;
@@ -66,7 +75,7 @@ export const useTokens = () => {
           .from('user_portfolio')
           .insert({ 
             user_id: user.id, 
-            tokens: tokensToSave 
+            tokens: tokensJson 
           });
         
         if (error) throw error;
