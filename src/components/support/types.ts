@@ -20,6 +20,14 @@ export type SupportQuestion = {
   text: string;
 };
 
+export type SupportRequest = {
+  id: string;
+  status: 'open' | 'in-progress' | 'resolved';
+  type: string;
+  createdAt: Date;
+  lastUpdated: Date;
+};
+
 export interface SupportChatbotProps {
   open: boolean;
   onClose: () => void;

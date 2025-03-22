@@ -54,6 +54,7 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
     const satisfactionOptions = ["satisfied", "not_satisfied"];
     const agentRequestOptions = ["connect_agent", "try_again"];
     const callbackTypeOptions = ["callback_now", "callback_scheduled", "continue_chat"];
+    const requestOptions = ["view_all_requests", "new_request"];
     
     // Check if the option is in one of the special categories
     if (satisfactionOptions.includes(questionId)) {
@@ -62,6 +63,9 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
       handleAgentRequestResponse(questionId);
     } else if (callbackTypeOptions.includes(questionId)) {
       handleCallbackTypeSelected(questionId);
+    } else if (requestOptions.includes(questionId) || questionId.startsWith('request_')) {
+      // Handle support request options
+      handleOptionSelected(questionId, questionText);
     } else {
       // Check for follow-up option
       const isFollowUpOption = Object.values(FOLLOW_UP_OPTIONS).some(
