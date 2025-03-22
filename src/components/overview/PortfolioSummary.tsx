@@ -14,12 +14,12 @@ const PortfolioSummary = ({ totalValue }: PortfolioSummaryProps) => {
   const availableValue = getAvailablePortfolioValue();
   
   return (
-    <div className="bg-white rounded-xl p-6 mb-8 shadow-sm">
+    <div className="bg-[#0f172a] border border-blue-900/30 rounded-xl p-6 mb-8 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-end justify-between">
         <div className="space-y-3">
           <div>
             <h3 className="text-muted-foreground text-sm font-medium">Total Portfolio Value</h3>
-            <div className="text-3xl font-bold mt-1">₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+            <div className="text-3xl font-bold mt-1 text-white">₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
           </div>
           
           {availableValue < totalValue && (
@@ -42,7 +42,7 @@ const PortfolioSummary = ({ totalValue }: PortfolioSummaryProps) => {
           )}
         </div>
         <div className="mt-4 md:mt-0">
-          <Button variant="outline">Export Report</Button>
+          <Button variant="outline" className="bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white">Export Report</Button>
         </div>
       </div>
     </div>

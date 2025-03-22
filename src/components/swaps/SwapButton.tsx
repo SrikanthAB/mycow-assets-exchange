@@ -22,7 +22,7 @@ const SwapButton = ({
 
   return (
     <Button 
-      className="w-full shadow-md bg-blue-500 hover:bg-blue-600 text-white transition-all duration-300" 
+      className="w-full shadow-md bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white transition-all duration-300" 
       disabled={!fromToken || !toToken || fromAmount <= 0 || insufficientBalance || isSwapping}
       onClick={onClick}
     >

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -123,20 +124,20 @@ const IBPLs = () => {
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* New Loan Application */}
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="text-xl font-medium mb-6">Apply for a New Loan</h3>
+              <div className="bg-[#0f172a] border border-blue-900/30 rounded-xl shadow-sm p-6">
+                <h3 className="text-xl font-medium mb-6 text-white">Apply for a New Loan</h3>
                 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Available Collateral</label>
-                    <div className="bg-muted/30 p-4 rounded-lg">
+                    <label className="block text-sm font-medium mb-2 text-gray-300">Available Collateral</label>
+                    <div className="bg-[#1e293b] border border-blue-900/30 p-4 rounded-lg">
                       <div className="flex justify-between mb-2">
                         <span className="text-muted-foreground">Available Portfolio Value</span>
-                        <span className="font-medium">₹{availablePortfolioValue.toLocaleString('en-IN')}</span>
+                        <span className="font-medium text-white">₹{availablePortfolioValue.toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Max Loan Available</span>
-                        <span className="font-medium">₹{maxLoanAmount.toLocaleString('en-IN')}</span>
+                        <span className="font-medium text-white">₹{maxLoanAmount.toLocaleString('en-IN')}</span>
                       </div>
                     </div>
                   </div>
@@ -253,7 +254,7 @@ const IBPLs = () => {
                   )}
                   
                   <Button 
-                    className="w-full mt-4" 
+                    className="w-full mt-4 bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white" 
                     disabled={loanAmount <= 0 || loanAmount > maxLoanAmount || !hasEnoughCollateral || availableTokens.length === 0}
                     onClick={handleApplyForLoan}
                   >
@@ -264,25 +265,26 @@ const IBPLs = () => {
               
               {/* Active Loans */}
               <div>
-                <h3 className="text-xl font-medium mb-6">Active Loans</h3>
+                <h3 className="text-xl font-medium mb-6 text-white">Active Loans</h3>
                 
                 {loans.filter(loan => loan.status === 'active').length === 0 ? (
-                  <div className="bg-background rounded-xl shadow-sm p-6 text-center">
+                  <div className="bg-[#0f172a] border border-blue-900/30 rounded-xl shadow-sm p-6 text-center">
                     <p className="text-muted-foreground">You don't have any active loans.</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {loans.filter(loan => loan.status === 'active').map(loan => (
-                      <div key={loan.id} className="bg-background rounded-xl shadow-sm p-6">
+                      <div key={loan.id} className="bg-[#0f172a] border border-blue-900/30 rounded-xl shadow-sm p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div>
                             <Badge variant="outline" className="mb-2">Active</Badge>
-                            <h4 className="text-lg font-medium">₹{loan.amount.toLocaleString('en-IN')}</h4>
+                            <h4 className="text-lg font-medium text-white">₹{loan.amount.toLocaleString('en-IN')}</h4>
                             <p className="text-sm text-muted-foreground">{loan.remainingDays} days remaining</p>
                           </div>
                           <Button 
                             variant="outline" 
                             size="sm"
+                            className="bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white"
                             onClick={() => {
                               setSelectedLoanId(loan.id);
                               setRepayDialogOpen(true);
@@ -320,13 +322,13 @@ const IBPLs = () => {
                   </div>
                 )}
                 
-                <div className="mt-8 bg-muted/30 rounded-xl p-6">
+                <div className="mt-8 bg-[#1e293b] border border-blue-900/30 rounded-xl p-6">
                   <div className="flex items-start">
                     <div className="mr-4 p-2 bg-primary/10 rounded-lg">
                       <Calculator className="text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-medium">Need help planning your loan?</h4>
+                      <h4 className="font-medium text-white">Need help planning your loan?</h4>
                       <p className="text-sm text-muted-foreground mt-1">
                         Our loan calculator can help you estimate payments and find the best terms for your situation.
                       </p>
@@ -343,7 +345,7 @@ const IBPLs = () => {
       </main>
       
       <Dialog open={repayDialogOpen} onOpenChange={setRepayDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-[#0f172a] border border-blue-900/30 text-white">
           <DialogHeader>
             <DialogTitle>Repay Loan</DialogTitle>
             <DialogDescription>
@@ -354,17 +356,17 @@ const IBPLs = () => {
           <div className="py-4">
             <div className="flex justify-between mb-2">
               <span className="text-muted-foreground">Repayment Amount</span>
-              <span className="font-medium">₹{getRepaymentAmount(selectedLoanId).toLocaleString('en-IN')}</span>
+              <span className="font-medium text-white">₹{getRepaymentAmount(selectedLoanId).toLocaleString('en-IN')}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Your Wallet Balance</span>
-              <span className="font-medium">₹{walletBalance.toLocaleString('en-IN')}</span>
+              <span className="font-medium text-white">₹{walletBalance.toLocaleString('en-IN')}</span>
             </div>
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRepayDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleRepayLoan}>Repay Loan</Button>
+            <Button variant="outline" className="bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white" onClick={() => setRepayDialogOpen(false)}>Cancel</Button>
+            <Button className="bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white" onClick={handleRepayLoan}>Repay Loan</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
