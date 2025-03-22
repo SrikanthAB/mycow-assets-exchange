@@ -26,26 +26,40 @@ export const useSwapForm = (tokens: Token[]) => {
   useEffect(() => {
     if (fromToken && toToken) {
       calculateExchangeRate();
+    } else {
+      // Reset values if tokens are not selected
+      setExchangeRate(null);
+      setToAmount(null);
     }
   }, [fromToken, toToken, fromAmount]);
 
   const calculateExchangeRate = () => {
-    if (!fromToken || !toToken) return;
+    if (!fromToken || !toToken) {
+      setExchangeRate(null);
+      setToAmount(null);
+      return;
+    }
 
-    // Add small random variation to simulate market fluctuations
-    const baseRate = fromToken.price / toToken.price;
-    const variation = 0.01 * (Math.random() * 2 - 1); // Random variation between -1% and +1%
-    const rate = baseRate * (1 + variation);
-    
-    setExchangeRate(rate);
-    
-    if (fromAmount > 0) {
-      // Apply a 0.5% swap fee
-      const swapFee = 0.005;
-      const calculatedAmount = (fromAmount * rate) * (1 - swapFee);
-      setToAmount(calculatedAmount);
-    } else {
-      setToAmount(0);
+    try {
+      // Add small random variation to simulate market fluctuations
+      const baseRate = fromToken.price / toToken.price;
+      const variation = 0.01 * (Math.random() * 2 - 1); // Random variation between -1% and +1%
+      const rate = baseRate * (1 + variation);
+      
+      setExchangeRate(rate);
+      
+      if (fromAmount > 0) {
+        // Apply a 0.5% swap fee
+        const swapFee = 0.005;
+        const calculatedAmount = (fromAmount * rate) * (1 - swapFee);
+        setToAmount(calculatedAmount);
+      } else {
+        setToAmount(0);
+      }
+    } catch (error) {
+      console.error("Error calculating exchange rate:", error);
+      setExchangeRate(null);
+      setToAmount(null);
     }
   };
 

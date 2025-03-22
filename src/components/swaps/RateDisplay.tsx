@@ -20,6 +20,9 @@ const RateDisplay = ({
 }: RateDisplayProps) => {
   if (!fromToken || !toToken || exchangeRate === null) return null;
   
+  // Format the exchange rate with defensive coding
+  const formattedRate = typeof exchangeRate === 'number' ? exchangeRate.toFixed(4) : '0.0000';
+  
   return (
     <Card className="flex justify-between items-center text-sm text-muted-foreground mb-6 bg-muted/30 p-3 rounded-lg border border-primary/10 shadow-md backdrop-blur-sm">
       <div className="flex items-center gap-2">
@@ -28,7 +31,7 @@ const RateDisplay = ({
       </div>
       <div className="flex items-center">
         <Badge variant="outline" className="font-normal mr-2 border-primary/20 bg-primary/5">
-          1 {fromToken.symbol} = {exchangeRate.toFixed(4)} {toToken.symbol}
+          1 {fromToken.symbol} = {formattedRate} {toToken.symbol}
         </Badge>
         <Button 
           variant="ghost" 
