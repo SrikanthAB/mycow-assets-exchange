@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth";
 import UserProfileModal from "./UserProfileModal";
 import SupportChatbot from "./SupportChatbot";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Import our new components
 import HeaderLink from "./navbar/HeaderLink";
@@ -17,6 +18,7 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isSupportChatOpen, setIsSupportChatOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   const handleLogout = () => {
     if (signOut) {
@@ -78,7 +80,7 @@ const Navbar = () => {
               </>
             )}
             
-            <MobileNavigation />
+            {!isMobile && <MobileNavigation />}
           </div>
         </div>
       </div>
