@@ -49,18 +49,34 @@ const MobileNavigation: React.FC = () => {
             <Link to="/markets" className="text-sm font-medium py-2 hover:text-primary transition-colors">
               Markets
             </Link>
-            <Link to="/overview" className="text-sm font-medium py-2 hover:text-primary transition-colors">
-              Overview
-            </Link>
-            <Link to="/staking" className="text-sm font-medium py-2 hover:text-primary transition-colors">
-              Staking
-            </Link>
-            <Link to="/swaps" className="text-sm font-medium py-2 hover:text-primary transition-colors">
-              Swaps
-            </Link>
-            <Link to="/ibpls" className="text-sm font-medium py-2 hover:text-primary transition-colors">
-              IBPLs
-            </Link>
+            <a 
+              href="#" 
+              className="text-sm font-medium py-2 hover:text-primary transition-colors"
+              onClick={(e) => handleComingSoon(e, "MyCow Layer 1")}
+            >
+              MyCow Layer 1
+            </a>
+            <a 
+              href="#" 
+              className="text-sm font-medium py-2 hover:text-primary transition-colors"
+              onClick={(e) => handleComingSoon(e, "MyCow RWA's")}
+            >
+              MyCow RWA's
+            </a>
+            <a 
+              href="#" 
+              className="text-sm font-medium py-2 hover:text-primary transition-colors"
+              onClick={(e) => handleComingSoon(e, "MyCow Exchange")}
+            >
+              MyCow Exchange
+            </a>
+            <a 
+              href="#" 
+              className="text-sm font-medium py-2 hover:text-primary transition-colors"
+              onClick={(e) => handleComingSoon(e, "MyCow Stable Coin")}
+            >
+              MyCow Stable Coin
+            </a>
           </nav>
         </div>
         
