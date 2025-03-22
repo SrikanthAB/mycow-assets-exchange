@@ -1,6 +1,9 @@
 
 import { RefreshCw } from "lucide-react";
 import { Token } from "@/contexts/portfolio";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface RateDisplayProps {
   fromToken: Token | null;
@@ -18,18 +21,22 @@ const RateDisplay = ({
   if (!fromToken || !toToken) return null;
   
   return (
-    <div className="flex justify-between items-center text-sm text-muted-foreground mb-6 bg-muted/30 p-3 rounded-lg">
+    <Card className="flex justify-between items-center text-sm text-muted-foreground mb-6 bg-muted/30 p-3 rounded-lg border-none shadow-sm">
       <div>Exchange Rate</div>
       <div className="flex items-center">
-        <span>1 {fromToken.symbol} = {exchangeRate.toFixed(4)} {toToken.symbol}</span>
-        <button 
-          className="ml-2 p-1 hover:bg-muted rounded-full" 
+        <Badge variant="outline" className="font-normal mr-2">
+          1 {fromToken.symbol} = {exchangeRate.toFixed(4)} {toToken.symbol}
+        </Badge>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-6 w-6" 
           onClick={onRefresh}
         >
           <RefreshCw className="w-3 h-3" />
-        </button>
+        </Button>
       </div>
-    </div>
+    </Card>
   );
 };
 
