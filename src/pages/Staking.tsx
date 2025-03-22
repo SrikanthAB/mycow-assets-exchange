@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -9,7 +8,7 @@ import StakingHeader from "@/components/staking/StakingHeader";
 import YieldStrategiesSection from "@/components/staking/YieldStrategiesSection";
 import ProjectedGrowthCard from "@/components/staking/ProjectedGrowthCard";
 import StakingStats from "@/components/staking/StakingStats";
-import StakeTokenModal from "@/components/StakeTokenModal";
+import StakeTokenModal from "@/components/staking/modals/StakeTokenModal";
 
 // Updated yield strategies with more detailed information
 const yieldStrategies = [
