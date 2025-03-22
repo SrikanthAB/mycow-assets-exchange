@@ -2,6 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Info, Sparkle } from "lucide-react";
 import { useTheme } from "@/components/ui/theme-provider";
+import { useState } from "react";
+import YieldInfoModal from "./modals/YieldInfoModal";
 
 interface StakingHeaderProps {
   onStake: () => void;
@@ -10,6 +12,7 @@ interface StakingHeaderProps {
 const StakingHeader = ({ onStake }: StakingHeaderProps) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [isYieldInfoOpen, setIsYieldInfoOpen] = useState(false);
   
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10">
@@ -44,12 +47,17 @@ const StakingHeader = ({ onStake }: StakingHeaderProps) => {
               ? "border-blue-500/50 text-blue-300 hover:bg-blue-900/30" 
               : "border-primary/50 text-primary hover:bg-primary/10"
           } 
-          onClick={onStake}
+          onClick={() => setIsYieldInfoOpen(true)}
         >
           <Info size={16} />
           Learn About Yields
         </Button>
       </div>
+
+      <YieldInfoModal 
+        open={isYieldInfoOpen}
+        onOpenChange={setIsYieldInfoOpen}
+      />
     </div>
   );
 };
