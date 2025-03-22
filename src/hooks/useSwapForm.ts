@@ -43,6 +43,15 @@ export const useSwapForm = (tokens: Token[]) => {
     try {
       // Add small random variation to simulate market fluctuations
       const baseRate = fromToken.price / toToken.price;
+      
+      // Check for NaN or Infinity
+      if (isNaN(baseRate) || !isFinite(baseRate)) {
+        console.error("Invalid price data for exchange rate calculation");
+        setExchangeRate(null);
+        setToAmount(null);
+        return;
+      }
+      
       const variation = 0.01 * (Math.random() * 2 - 1); // Random variation between -1% and +1%
       const rate = baseRate * (1 + variation);
       

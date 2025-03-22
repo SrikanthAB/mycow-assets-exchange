@@ -21,7 +21,9 @@ const RateDisplay = ({
   if (!fromToken || !toToken || exchangeRate === null) return null;
   
   // Format the exchange rate with defensive coding
-  const formattedRate = typeof exchangeRate === 'number' ? exchangeRate.toFixed(4) : '0.0000';
+  const formattedRate = typeof exchangeRate === 'number' && !isNaN(exchangeRate) 
+    ? exchangeRate.toFixed(4) 
+    : '0.0000';
   
   return (
     <Card className="flex justify-between items-center text-sm text-muted-foreground mb-6 bg-muted/30 p-3 rounded-lg border border-primary/10 shadow-md backdrop-blur-sm">

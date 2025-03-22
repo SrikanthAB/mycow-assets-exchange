@@ -29,8 +29,10 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
     refreshRate
   } = useSwapForm(tokens);
   
-  // Format toAmount safely to handle null values
-  const formattedToAmount = toAmount !== null ? toAmount.toFixed(4) : "0.0";
+  // Safely format toAmount to handle null/undefined values
+  const formattedToAmount = toAmount !== null && toAmount !== undefined 
+    ? toAmount.toFixed(4) 
+    : "0.0000";
   
   return (
     <div className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border border-gray-200'} rounded-xl shadow-sm p-6`}>
