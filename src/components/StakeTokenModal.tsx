@@ -6,9 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Token } from "@/contexts/portfolio/types";
 import { usePortfolio } from "@/contexts/portfolio/usePortfolio";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface StakeTokenModalProps {
   open: boolean;
@@ -26,18 +33,30 @@ interface StakeTokenModalProps {
 }
 
 const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }: StakeTokenModalProps) => {
-  const [selectedToken, setSelectedToken] = useState<Token | null>(initialToken);
-  const [amount, setAmount] = useState<number>(initialToken?.balance || 0);
+  const [selectedToken, setSelectedToken] = useState<Token | null>(initialToken || (tokens.length > 0 ? tokens[0] : null));
+  const [amount, setAmount] = useState<number>(selectedToken?.balance || 0);
   const [autoCompound, setAutoCompound] = useState<boolean>(true);
   const [yieldRedirect, setYieldRedirect] = useState<boolean>(true);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const { toast } = useToast();
   const { toggleTokenStaking, addTransaction } = usePortfolio();
   
-  const token = selectedToken || initialToken || tokens[0];
+  // Safely get the token
+  const token = selectedToken;
   const currentYield = token?.yield ? parseFloat(token.yield.replace(/[^0-9.]/g, '')) : 0;
   const strategyYield = strategy ? parseFloat(strategy.expectedReturn.split('-')[1]) : 0;
   const compoundBenefit = yieldRedirect ? (strategyYield - currentYield) : 0;
+  
+  // Handle token selection change
+  const handleTokenChange = (tokenId: string) => {
+    const newToken = tokens.find(t => t.id === tokenId) || null;
+    setSelectedToken(newToken);
+    if (newToken) {
+      setAmount(newToken.balance);
+    } else {
+      setAmount(0);
+    }
+  };
   
   const handleStake = async () => {
     if (!token || !amount || amount <= 0 || amount > token.balance) return;
@@ -70,7 +89,7 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
       console.error("Error staking tokens:", error);
       toast({
         title: "Error Staking Tokens",
-        description: "There was an error staking your tokens. Please try again.",
+        description: "There was an error unstaking your tokens. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -79,19 +98,56 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
     }
   };
   
+  if (tokens.length === 0) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>No Available Tokens</DialogTitle>
+            <DialogDescription>
+              You don't have any unstaked tokens available
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => onOpenChange(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  
   if (!token) return null;
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Stake {token.name}</DialogTitle>
+          <DialogTitle>Stake Token</DialogTitle>
           <DialogDescription>
-            Configure staking options for your {token.symbol} tokens
+            Configure staking options for your tokens
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Select Token</label>
+            <Select
+              value={token.id}
+              onValueChange={handleTokenChange}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue>
+                  {token ? `${token.name} (${token.symbol})` : "Select a token"}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {tokens.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.name} ({t.symbol}) - Balance: {t.balance}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
           <div>
             <label className="text-sm font-medium mb-2 block">Current Yield</label>
             <div className="p-3 bg-muted rounded-md font-medium text-green-600">{token.yield || "0% APY"}</div>

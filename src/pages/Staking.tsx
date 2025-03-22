@@ -46,8 +46,9 @@ const Staking = () => {
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [selectedStrategy, setSelectedStrategy] = useState(yieldStrategies[0].id);
   
-  // Filter staked tokens
+  // Filter staked and unstaked tokens
   const stakedTokens = tokens.filter(token => token.staked);
+  const unstackedTokens = tokens.filter(token => !token.staked);
   
   const handleStake = (token: Token) => {
     setSelectedToken(token);
@@ -90,7 +91,7 @@ const Staking = () => {
         <StakeTokenModal 
           open={isStakeModalOpen}
           onOpenChange={setIsStakeModalOpen}
-          tokens={tokens.filter(t => !t.staked)}
+          tokens={unstackedTokens}
           initialToken={selectedToken}
           strategy={yieldStrategies.find(s => s.id === selectedStrategy)}
         />
