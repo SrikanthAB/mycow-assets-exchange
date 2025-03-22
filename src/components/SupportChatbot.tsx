@@ -20,6 +20,7 @@ import {
 import { useChatSupport } from './support/useChatSupport';
 import MessageBubble from './support/MessageBubble';
 import CallbackForm from './support/CallbackForm';
+import { FOLLOW_UP_OPTIONS } from './support/constants';
 import { SupportChatbotProps } from './support/types';
 
 const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
@@ -159,8 +160,5 @@ const SupportChatbot = ({ open, onClose }: SupportChatbotProps) => {
     </Dialog>
   );
 };
-
-// Add missing import for FOLLOW_UP_OPTIONS
-import { FOLLOW_UP_OPTIONS } from './support/constants';
 
 export default SupportChatbot;
