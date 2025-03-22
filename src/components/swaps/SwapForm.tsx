@@ -29,6 +29,9 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
     refreshRate
   } = useSwapForm(tokens);
   
+  // Format toAmount safely to handle null values
+  const formattedToAmount = toAmount !== null ? toAmount.toFixed(4) : "0.0";
+  
   return (
     <div className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border border-gray-200'} rounded-xl shadow-sm p-6`}>
       <div className="mb-6">
@@ -57,7 +60,7 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
         />
         
         <SwapInputField
-          amount={toAmount ? toAmount.toFixed(4) : ""}
+          amount={formattedToAmount}
           token={toToken}
           onTokenChange={handleToTokenChange}
           tokens={tokens}
@@ -65,7 +68,7 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
         />
       </div>
       
-      {fromToken && toToken && (
+      {fromToken && toToken && exchangeRate !== null && (
         <RateDisplay 
           fromToken={fromToken}
           toToken={toToken}

@@ -107,7 +107,7 @@ export const useSwapForm = (tokens: Token[]) => {
   };
 
   const handleSwap = async () => {
-    if (!fromToken || !toToken || !fromAmount || fromAmount <= 0 || !toAmount) {
+    if (!fromToken || !toToken || !fromAmount || fromAmount <= 0 || toAmount === null) {
       toast({
         title: "Invalid swap parameters",
         description: "Please ensure all swap details are correctly specified.",

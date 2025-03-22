@@ -30,6 +30,9 @@ const SwapInputField = ({
   // Check if token is locked
   const isLocked = token?.locked && token?.lockedAmount && token?.lockedAmount >= token?.balance;
   
+  // Format the amount value safely for display
+  const displayAmount = amount !== null && amount !== undefined ? amount : "";
+  
   return (
     <div className={`mt-2 mb-4 ${theme === 'dark' ? 'bg-[#1e293b]' : 'bg-gray-50'} p-4 rounded-xl ${theme === 'dark' ? 'border border-blue-900/30' : 'border border-gray-200'}`}>
       <TokenSelector
@@ -43,7 +46,7 @@ const SwapInputField = ({
       <div className="mt-3 relative">
         <Input
           type="number"
-          value={amount || ""}
+          value={displayAmount}
           onChange={onChange}
           placeholder={placeholder}
           min="0"

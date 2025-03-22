@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 interface RateDisplayProps {
   fromToken: Token | null;
   toToken: Token | null;
-  exchangeRate: number;
+  exchangeRate: number | null;
   onRefresh: () => void;
 }
 
@@ -18,7 +18,7 @@ const RateDisplay = ({
   exchangeRate, 
   onRefresh 
 }: RateDisplayProps) => {
-  if (!fromToken || !toToken) return null;
+  if (!fromToken || !toToken || exchangeRate === null) return null;
   
   return (
     <Card className="flex justify-between items-center text-sm text-muted-foreground mb-6 bg-muted/30 p-3 rounded-lg border border-primary/10 shadow-md backdrop-blur-sm">
