@@ -47,6 +47,16 @@ const StakedTokensCard = ({ stakedTokens, onManageToken }: StakedTokensCardProps
     }
   };
   
+  // Generate random yields for tokens that don't have one specified
+  const getTokenYield = (token: Token) => {
+    if (token.yield) return token.yield;
+    
+    // Generate a yield between 5% and 15% based on token id
+    const hash = token.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+    const yieldValue = 5 + (hash % 10);
+    return `${yieldValue}% APY`;
+  };
+  
   return (
     <Card className={isDark ? "bg-[#0f172a] border-blue-900/50 text-white" : "border-primary/20"}>
       <CardHeader>
@@ -100,7 +110,7 @@ const StakedTokensCard = ({ stakedTokens, onManageToken }: StakedTokensCardProps
                   
                   <div className="flex items-center text-sm mt-1">
                     <span className="text-green-500 font-medium mr-1">
-                      {token.yield || "0% APY"}
+                      {getTokenYield(token)}
                     </span>
                     <Sparkle size={14} className="text-amber-500" />
                   </div>
