@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -27,10 +28,11 @@ const Footer = () => {
     {
       title: "Products",
       links: [
-        { name: "MyCow Layer 1", path: "/layer1", isComingSoon: true },
-        { name: "MyCow RWA's", path: "/rwas", isComingSoon: true },
-        { name: "MyCow Exchange", path: "/exchange", isComingSoon: true },
-        { name: "MyCow Stable Coin", path: "/stablecoin", isComingSoon: true },
+        { name: "Overview", path: "/overview" },
+        { name: "Staking", path: "/staking" },
+        { name: "Swaps", path: "/swaps" },
+        { name: "Markets", path: "/markets" },
+        { name: "IBPLs", path: "/ibpls" },
       ]
     },
     {
@@ -117,11 +119,6 @@ const Footer = () => {
                         onClick={(e) => handleLinkClick(link, e)}
                       >
                         {link.name}
-                        {section.title === "Products" && link.isComingSoon && (
-                          <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                            Soon
-                          </span>
-                        )}
                       </a>
                     ) : (
                       <Link 
@@ -130,11 +127,6 @@ const Footer = () => {
                         onClick={(e) => handleLinkClick(link, e)}
                       >
                         {link.name}
-                        {section.title === "Products" && link.isComingSoon && (
-                          <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                            Soon
-                          </span>
-                        )}
                       </Link>
                     )}
                   </li>
