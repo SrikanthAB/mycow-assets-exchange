@@ -9,7 +9,7 @@ import { ArrowDown, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const Swaps = () => {
-  const { tokens, updateTokenBalance } = usePortfolio();
+  const { tokens, updateTokenBalance, addTransaction } = usePortfolio();
   const [fromToken, setFromToken] = useState<Token | null>(null);
   const [toToken, setToToken] = useState<Token | null>(null);
   const [fromAmount, setFromAmount] = useState<number>(0);
@@ -92,6 +92,24 @@ const Swaps = () => {
       // Update balances
       updateTokenBalance(fromToken.id, -fromAmount);
       updateTokenBalance(toToken.id, toAmount);
+      
+      // Add sell transaction for fromToken
+      addTransaction({
+        type: 'sell',
+        asset: fromToken.name,
+        amount: fromAmount,
+        value: fromAmount * fromToken.price,
+        status: 'completed'
+      });
+      
+      // Add buy transaction for toToken
+      addTransaction({
+        type: 'buy',
+        asset: toToken.name,
+        amount: toAmount,
+        value: toAmount * toToken.price,
+        status: 'completed'
+      });
       
       // Show success message
       toast({
