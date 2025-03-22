@@ -1,6 +1,6 @@
 
 import React from "react";
-import { usePortfolio } from "@/contexts/PortfolioContext";
+import { usePortfolio } from "@/contexts/portfolio";
 import { Download, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";

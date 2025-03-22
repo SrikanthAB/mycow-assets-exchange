@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AssetCard from "@/components/AssetCard";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import BuyTokenModal from "@/components/BuyTokenModal";
-import { usePortfolio, Token } from "@/contexts/PortfolioContext";
+import { usePortfolio, Token } from "@/contexts/portfolio";
 
 // Mock data for asset listings
 const marketAssets = [

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { usePortfolio } from "@/contexts/PortfolioContext";
+import { usePortfolio } from "@/contexts/portfolio";
 import { Button } from "@/components/ui/button";
 import PortfolioSummary from "./PortfolioSummary";
 import AssetCard from "./AssetCard";

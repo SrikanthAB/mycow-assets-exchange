@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowUpRight, ChevronRight, Gem, Info } from "lucide-react";
-import { usePortfolio } from "@/contexts/PortfolioContext";
+import { usePortfolio } from "@/contexts/portfolio";
 import YieldStrategyCard from "@/components/YieldStrategyCard";
 import StakeTokenModal from "@/components/StakeTokenModal";
 
