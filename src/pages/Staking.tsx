@@ -11,30 +11,30 @@ import ProjectedGrowthCard from "@/components/staking/ProjectedGrowthCard";
 import StakingStats from "@/components/staking/StakingStats";
 import StakeTokenModal from "@/components/StakeTokenModal";
 
-// Placeholder data for yield strategies
+// Updated yield strategies with more detailed information
 const yieldStrategies = [
   {
     id: "strategy-1",
     name: "Conservative",
-    description: "Lower risk investments focusing on stable assets with regular payouts",
+    description: "Focus on senior tranches of private credit with stable returns and lower risk",
     expectedReturn: "5-8%",
-    assets: ["Real Estate", "Commodities", "Stablecoins"],
+    assets: ["Private Credit", "Real Estate", "Stablecoins"],
     risk: "Low"
   },
   {
     id: "strategy-2",
     name: "Balanced",
-    description: "Diversified portfolio with a mix of stable and growth assets",
-    expectedReturn: "8-12%",
-    assets: ["Real Estate", "Entertainment", "Native Tokens"],
+    description: "Diversified portfolio of private credit and select entertainment rights",
+    expectedReturn: "8-15%",
+    assets: ["Private Credit", "Entertainment", "Real Estate"],
     risk: "Medium"
   },
   {
     id: "strategy-3",
     name: "Growth",
-    description: "Focus on high growth potential assets with higher volatility",
-    expectedReturn: "12-20%",
-    assets: ["Private Credit", "Entertainment", "Native Tokens"],
+    description: "Higher exposure to entertainment rights and junior credit tranches for maximum returns",
+    expectedReturn: "15-25%",
+    assets: ["Entertainment", "Junior Tranches", "Native Tokens"],
     risk: "High"
   }
 ];
@@ -92,6 +92,7 @@ const Staking = () => {
           onOpenChange={setIsStakeModalOpen}
           tokens={tokens.filter(t => !t.staked)}
           initialToken={selectedToken}
+          strategy={yieldStrategies.find(s => s.id === selectedStrategy)}
         />
       )}
       
