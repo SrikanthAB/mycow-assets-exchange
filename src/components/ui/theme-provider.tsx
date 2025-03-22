@@ -6,24 +6,47 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { type ThemeProviderProps } from "next-themes/dist/types"
 
+type ThemeProviderContextProps = {
+  theme: string;
+  setTheme: (theme: string) => void;
+}
+
 // Create a context with default values
-const ThemeContext = createContext({
-  theme: "",
-  setTheme: (theme: string) => {}
+const ThemeContext = createContext<ThemeProviderContextProps>({
+  theme: "dark",
+  setTheme: () => {},
 })
 
 export function ThemeProvider({ 
   children, 
   ...props 
 }: ThemeProviderProps) {
-  // Set default theme to light
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("mycow-theme-preference") || "light"
-    document.documentElement.classList.add(savedTheme)
-    localStorage.setItem("mycow-theme-preference", savedTheme)
-  }, [])
+  const [theme, setThemeState] = useState<string>("dark");
   
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+  useEffect(() => {
+    // Get saved theme or use system preference or default to dark
+    const savedTheme = localStorage.getItem("mycow-theme-preference") || "dark";
+    setThemeState(savedTheme);
+    
+    // Apply the theme to document
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(savedTheme);
+  }, []);
+  
+  const setTheme = (newTheme: string) => {
+    setThemeState(newTheme);
+    localStorage.setItem("mycow-theme-preference", newTheme);
+    
+    // Update document class for theme
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(newTheme);
+  };
+  
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
 export function ThemeToggle() {
@@ -67,38 +90,5 @@ export function ThemeToggle() {
 }
 
 export const useTheme = () => {
-  const context = useContext(ThemeContext)
-  if (context === undefined) {
-    // Use a default implementation if outside provider
-    const [theme, setThemeState] = useState<string>("light")
-    
-    useEffect(() => {
-      // Check for system preference or stored preference
-      const savedTheme = localStorage.getItem("mycow-theme-preference") || "light"
-      setThemeState(savedTheme)
-      
-      if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark")
-        document.documentElement.classList.remove("light")
-      } else {
-        document.documentElement.classList.add("light")
-        document.documentElement.classList.remove("dark")
-      }
-    }, [])
-    
-    const setTheme = (newTheme: string) => {
-      setThemeState(newTheme)
-      localStorage.setItem("mycow-theme-preference", newTheme)
-      if (newTheme === "dark") {
-        document.documentElement.classList.add("dark")
-        document.documentElement.classList.remove("light")
-      } else {
-        document.documentElement.classList.add("light")
-        document.documentElement.classList.remove("dark")
-      }
-    }
-    
-    return { theme, setTheme }
-  }
-  return context
+  return useContext(ThemeContext);
 }
