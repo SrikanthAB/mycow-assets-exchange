@@ -35,11 +35,13 @@ const Navbar = () => {
   };
   
   const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
+    const newTheme = theme === "light" ? "dark" : "light";
+    console.log("Toggling theme to:", newTheme);
+    setTheme(newTheme);
   };
   
   return (
-    <header className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+    <header className={`fixed w-full top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border`}>
       <div className="container mx-auto">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">

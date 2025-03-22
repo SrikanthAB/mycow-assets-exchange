@@ -19,19 +19,20 @@ const ThemeContext = createContext<ThemeProviderContextProps>({
 
 export function ThemeProvider({ 
   children, 
+  defaultTheme = "dark",
   ...props 
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<string>("dark");
   
   useEffect(() => {
-    // Get saved theme or use system preference or default to dark
-    const savedTheme = localStorage.getItem("mycow-theme-preference") || "dark";
+    // Get saved theme or use default
+    const savedTheme = localStorage.getItem("mycow-theme-preference") || defaultTheme;
     setThemeState(savedTheme);
     
     // Apply the theme to document
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(savedTheme);
-  }, []);
+  }, [defaultTheme]);
   
   const setTheme = (newTheme: string) => {
     setThemeState(newTheme);
