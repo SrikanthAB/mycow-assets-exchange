@@ -4,46 +4,64 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   
+  // Organize footer links, marking existing routes that are already implemented
   const footerSections = [
     {
       title: "Products",
       links: [
-        { name: "Assets", path: "/assets" },
-        { name: "Markets", path: "/markets" },
-        { name: "Swaps", path: "/swaps" },
-        { name: "Staking", path: "/staking" },
-        { name: "IBPLs", path: "/ibpls" },
+        { name: "Assets", path: "/markets" }, // Redirecting to existing markets page
+        { name: "Markets", path: "/markets" }, // Existing route
+        { name: "Swaps", path: "/swaps" }, // Existing route
+        { name: "Staking", path: "/staking" }, // Existing route
+        { name: "IBPLs", path: "/ibpls" }, // Existing route
       ]
     },
     {
       title: "Resources",
       links: [
-        { name: "Documentation", path: "/docs" },
-        { name: "API", path: "/api" },
-        { name: "Market Data", path: "/market-data" },
-        { name: "Market Status", path: "/status" },
+        { name: "Documentation", path: "/docs", isExternal: true, url: "https://docs.mycow.exchange" },
+        { name: "API", path: "/api", isExternal: true, url: "https://api.mycow.exchange" },
+        { name: "Market Data", path: "/markets" }, // Redirecting to existing markets page
+        { name: "Market Status", path: "/status", isExternal: true, url: "https://status.mycow.exchange" },
       ]
     },
     {
       title: "Company",
       links: [
-        { name: "About", path: "/about" },
-        { name: "Press", path: "/press" },
-        { name: "Careers", path: "/careers" },
-        { name: "Security", path: "/security" },
-        { name: "Blog", path: "/blog" },
+        { name: "About", path: "/about", isComingSoon: true },
+        { name: "Press", path: "/press", isComingSoon: true },
+        { name: "Careers", path: "/careers", isComingSoon: true },
+        { name: "Security", path: "/security", isComingSoon: true },
+        { name: "Blog", path: "/blog", isComingSoon: true },
       ]
     },
     {
       title: "Legal",
       links: [
-        { name: "Terms", path: "/terms" },
-        { name: "Privacy", path: "/privacy" },
-        { name: "Cookies", path: "/cookies" },
-        { name: "License", path: "/license" },
+        { name: "Terms", path: "/terms", isComingSoon: true },
+        { name: "Privacy", path: "/privacy", isComingSoon: true },
+        { name: "Cookies", path: "/cookies", isComingSoon: true },
+        { name: "License", path: "/license", isComingSoon: true },
       ]
     }
   ];
+
+  // Handle link click with appropriate behavior based on link type
+  const handleLinkClick = (link: any, e: React.MouseEvent) => {
+    if (link.isComingSoon) {
+      e.preventDefault();
+      // Show toast notification for coming soon pages
+      import('@/hooks/use-toast').then(({ toast }) => {
+        toast({
+          title: "Coming Soon",
+          description: `The ${link.name} page is under development and will be available soon.`,
+          variant: "default",
+        });
+      });
+    } else if (link.isExternal && link.url) {
+      // External links open in a new tab, no need to prevent default
+    }
+  };
   
   return (
     <footer className="bg-muted">
@@ -64,14 +82,21 @@ const Footer = () => {
             </p>
             
             <div className="mt-6 flex items-center space-x-4">
-              {["Twitter", "LinkedIn", "Facebook", "Telegram"].map((social) => (
+              {[
+                { name: "Twitter", url: "https://twitter.com/mycowexchange" },
+                { name: "LinkedIn", url: "https://linkedin.com/company/mycowexchange" },
+                { name: "Facebook", url: "https://facebook.com/mycowexchange" },
+                { name: "Telegram", url: "https://t.me/mycowexchange" }
+              ].map((social) => (
                 <a 
-                  key={social} 
-                  href="#" 
+                  key={social.name} 
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="p-2 rounded-full bg-background hover:bg-background/80 transition-colors"
-                  aria-label={social}
+                  aria-label={social.name}
                 >
-                  {social[0]}
+                  {social.name[0]}
                 </a>
               ))}
             </div>
@@ -83,12 +108,35 @@ const Footer = () => {
               <ul className="space-y-3">
                 {section.links.map((link) => (
                   <li key={link.name}>
-                    <Link 
-                      to={link.path} 
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {link.name}
-                    </Link>
+                    {link.isExternal && link.url ? (
+                      <a 
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-foreground transition-colors flex items-center"
+                        onClick={(e) => handleLinkClick(link, e)}
+                      >
+                        {link.name}
+                        {link.isComingSoon && (
+                          <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                            Soon
+                          </span>
+                        )}
+                      </a>
+                    ) : (
+                      <Link 
+                        to={link.path} 
+                        className="text-muted-foreground hover:text-foreground transition-colors flex items-center"
+                        onClick={(e) => handleLinkClick(link, e)}
+                      >
+                        {link.name}
+                        {link.isComingSoon && (
+                          <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                            Soon
+                          </span>
+                        )}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -102,9 +150,9 @@ const Footer = () => {
             <div className="mt-4 md:mt-0 flex flex-wrap items-center">
               <p className="text-sm text-muted-foreground mr-4">Regulated by Financial Authorities of India</p>
               <div className="flex items-center space-x-3 mt-2 md:mt-0">
-                <span className="h-5 w-auto opacity-60">Logo 1</span>
-                <span className="h-5 w-auto opacity-60">Logo 2</span>
-                <span className="h-5 w-auto opacity-60">Logo 3</span>
+                <img src="https://placehold.co/40x20?text=RBI" alt="RBI Compliance" className="h-5 w-auto opacity-60" />
+                <img src="https://placehold.co/40x20?text=SEBI" alt="SEBI Compliance" className="h-5 w-auto opacity-60" />
+                <img src="https://placehold.co/40x20?text=IFSC" alt="IFSC Compliance" className="h-5 w-auto opacity-60" />
               </div>
             </div>
           </div>
