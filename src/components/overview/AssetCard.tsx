@@ -1,11 +1,12 @@
 
 import React, { useState } from "react";
 import { Token } from "@/contexts/portfolio/types";
-import { TrendingUp, TrendingDown, Lock } from "lucide-react";
+import { TrendingUp, TrendingDown, Lock, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import SellAssetModal from "./SellAssetModal";
+import AssetDetailsModal from "@/components/AssetDetailsModal";
 
 interface AssetCardProps {
   token: Token;
@@ -13,6 +14,7 @@ interface AssetCardProps {
 
 const AssetCard = ({ token }: AssetCardProps) => {
   const [sellModalOpen, setSellModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   
   const isPositiveChange = token.change >= 0;
   const tokenValue = token.price * token.balance;
@@ -25,6 +27,10 @@ const AssetCard = ({ token }: AssetCardProps) => {
   
   const closeSellModal = () => {
     setSellModalOpen(false);
+  };
+
+  const openDetailsModal = () => {
+    setDetailsModalOpen(true);
   };
   
   return (
@@ -43,6 +49,21 @@ const AssetCard = ({ token }: AssetCardProps) => {
           <div className="ml-3">
             <div className="flex items-center">
               <h4 className="font-medium text-white">{token.name}</h4>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      onClick={openDetailsModal}
+                      className="ml-2 text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      <Info size={16} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View asset details</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               {token.locked && (
                 <TooltipProvider>
                   <Tooltip>
@@ -122,6 +143,21 @@ const AssetCard = ({ token }: AssetCardProps) => {
         isOpen={sellModalOpen} 
         onClose={closeSellModal} 
         token={token} 
+      />
+
+      {/* Asset Details Modal */}
+      <AssetDetailsModal
+        open={detailsModalOpen}
+        onOpenChange={setDetailsModalOpen}
+        asset={{
+          id: token.id,
+          name: token.name,
+          symbol: token.symbol,
+          category: token.category,
+          price: token.priceString || token.price.toString(),
+          change: token.change,
+          yield: token.yield
+        }}
       />
     </div>
   );
