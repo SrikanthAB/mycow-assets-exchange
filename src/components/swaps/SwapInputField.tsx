@@ -40,7 +40,7 @@ const SwapInputField = ({
           placeholder={placeholder}
           min="0"
           step="0.01"
-          className={`w-full bg-background/60 backdrop-blur-sm border-secondary/20 focus:border-primary/40 ${readOnly ? "bg-muted/30" : ""}`}
+          className={`w-full bg-white border-secondary/20 focus:border-primary/40 ${readOnly ? "bg-muted/30" : ""}`}
           readOnly={readOnly}
         />
       </div>

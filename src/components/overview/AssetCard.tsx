@@ -28,7 +28,7 @@ const AssetCard = ({ token }: AssetCardProps) => {
   };
   
   return (
-    <div className="bg-background rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
+    <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
       <div className="flex items-start justify-between">
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center overflow-hidden">

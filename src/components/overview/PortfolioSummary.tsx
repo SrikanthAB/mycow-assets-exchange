@@ -8,7 +8,7 @@ interface PortfolioSummaryProps {
 
 const PortfolioSummary = ({ totalValue }: PortfolioSummaryProps) => {
   return (
-    <div className="bg-muted/30 rounded-xl p-6 mb-8">
+    <div className="bg-white rounded-xl p-6 mb-8 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-end justify-between">
         <div>
           <h3 className="text-muted-foreground text-sm font-medium">Total Portfolio Value</h3>

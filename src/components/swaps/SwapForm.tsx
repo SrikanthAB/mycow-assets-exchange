@@ -28,7 +28,7 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
   } = useSwapForm(tokens);
   
   return (
-    <div className="bg-background rounded-xl shadow-sm p-6">
+    <div className="bg-white rounded-xl shadow-sm p-6">
       <div className="mb-6">
         <TokenSelector 
           tokens={tokens}
