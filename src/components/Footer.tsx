@@ -28,10 +28,11 @@ const Footer = () => {
     {
       title: "Products",
       links: [
-        { name: "MyCow Layer 1", path: "/layer1", isComingSoon: true },
-        { name: "MyCow RWA's", path: "/rwas", isComingSoon: true },
-        { name: "MyCow Exchange", path: "/exchange", isComingSoon: true },
-        { name: "MyCow Stable Coin", path: "/stablecoin", isComingSoon: true },
+        { name: "Overview", path: "/overview" },
+        { name: "Staking", path: "/staking" },
+        { name: "Swaps", path: "/swaps" },
+        { name: "Markets", path: "/markets" },
+        { name: "IBPLs", path: "/ibpls" },
       ]
     },
     {
