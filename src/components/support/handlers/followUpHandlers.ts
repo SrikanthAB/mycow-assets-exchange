@@ -17,7 +17,6 @@ export const useFollowUpHandlers = (
     setIsLoading(true);
 
     try {
-      // The issue is here - we need to get the messages directly, not from the setMessages call
       // First, get the current messages
       let currentMessages: Message[] = [];
       setMessages(prev => {
@@ -35,7 +34,12 @@ export const useFollowUpHandlers = (
 
       if (error) {
         console.error('Error calling AI support:', error);
-        throw new Error(error.message || 'Failed to get a response');
+        throw new Error(`Failed to get a response: ${error.message || 'Unknown error'}`);
+      }
+
+      if (!data || !data.reply) {
+        console.error('Invalid response format from AI support:', data);
+        throw new Error('Received an invalid response format from the support service');
       }
 
       // Add AI response
@@ -57,6 +61,7 @@ export const useFollowUpHandlers = (
       
       setMessages(prevMessages => [...prevMessages, botResponse, satisfactionMessage]);
     } catch (error) {
+      // Pass the full error object with detailed information
       handleAIError(error, setMessages);
     } finally {
       setIsLoading(false);
