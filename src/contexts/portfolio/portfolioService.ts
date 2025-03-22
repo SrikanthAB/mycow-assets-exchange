@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Transaction } from "./types";
+import { User } from "@supabase/supabase-js";
 
 export const fetchTransactions = async () => {
   try {
@@ -34,6 +35,14 @@ export const fetchTransactions = async () => {
 
 export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.error('No authenticated user found when saving transaction');
+      throw new Error('User must be authenticated to save transactions');
+    }
+    
     const { error } = await supabase
       .from('transactions')
       .insert({
@@ -41,13 +50,16 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
         asset: transaction.asset,
         amount: transaction.amount,
         value: transaction.value,
-        status: transaction.status
+        status: transaction.status,
+        user_id: user.id // Add the user_id to the transaction record
       });
       
     if (error) {
       console.error('Error adding transaction to Supabase:', error);
       throw error;
     }
+    
+    console.log('Transaction saved successfully with user_id:', user.id);
   } catch (error) {
     console.error('Error in saveTransaction:', error);
     throw error;
