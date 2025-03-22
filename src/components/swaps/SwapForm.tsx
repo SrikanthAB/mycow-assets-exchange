@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { ArrowDown, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Token, usePortfolio } from "@/contexts/portfolio";
 import TokenSelector from "./TokenSelector";
 import RateDisplay from "./RateDisplay";
+import SwapInputField from "./SwapInputField";
+import TokenSwitcher from "./TokenSwitcher";
+import SwapButton from "./SwapButton";
 
 interface SwapFormProps {
   tokens: Token[];
@@ -159,36 +159,15 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
           label="From"
         />
         
-        <div className="flex gap-2 mb-4">
-          <Input
-            type="number"
-            value={fromAmount || ""}
-            onChange={handleFromAmountChange}
-            placeholder="0.0"
-            min="0"
-            step="0.01"
-            className="flex-1"
-          />
-          
-          <select 
-            className="bg-muted rounded-md px-3 py-2 text-sm"
-            value={fromToken?.id || ""}
-            onChange={handleFromTokenChange}
-          >
-            {tokens.map(token => (
-              <option key={token.id} value={token.id}>
-                {token.symbol}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SwapInputField
+          amount={fromAmount}
+          onChange={handleFromAmountChange}
+          token={fromToken}
+          onTokenChange={handleFromTokenChange}
+          tokens={tokens}
+        />
         
-        <button 
-          onClick={switchTokens}
-          className="bg-muted/50 hover:bg-muted w-10 h-10 rounded-full flex items-center justify-center mx-auto my-2"
-        >
-          <ArrowDown className="w-5 h-5" />
-        </button>
+        <TokenSwitcher onSwitch={switchTokens} />
         
         <TokenSelector 
           tokens={tokens}
@@ -197,27 +176,13 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
           label="To"
         />
         
-        <div className="flex gap-2">
-          <Input
-            type="number"
-            value={toAmount ? toAmount.toFixed(4) : ""}
-            placeholder="0.0"
-            readOnly
-            className="flex-1 bg-muted/30"
-          />
-          
-          <select 
-            className="bg-muted rounded-md px-3 py-2 text-sm"
-            value={toToken?.id || ""}
-            onChange={handleToTokenChange}
-          >
-            {tokens.map(token => (
-              <option key={token.id} value={token.id}>
-                {token.symbol}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SwapInputField
+          amount={toAmount ? toAmount.toFixed(4) : ""}
+          token={toToken}
+          onTokenChange={handleToTokenChange}
+          tokens={tokens}
+          readOnly={true}
+        />
       </div>
       
       {fromToken && toToken && (
@@ -229,22 +194,13 @@ const SwapForm = ({ tokens }: SwapFormProps) => {
         />
       )}
       
-      <Button 
-        className="w-full" 
-        disabled={!fromToken || !toToken || fromAmount <= 0 || fromAmount > (fromToken?.balance || 0) || isSwapping}
+      <SwapButton
+        fromToken={fromToken}
+        toToken={toToken}
+        fromAmount={fromAmount}
+        isSwapping={isSwapping}
         onClick={handleSwap}
-      >
-        {isSwapping ? (
-          <>
-            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-            Swapping...
-          </>
-        ) : fromAmount > (fromToken?.balance || 0) ? (
-          "Insufficient Balance"
-        ) : (
-          "Swap Tokens"
-        )}
-      </Button>
+      />
     </div>
   );
 };
