@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -23,7 +22,7 @@ const Footer = () => {
     }
   };
   
-  // Organize footer links with the updated product section
+  // Organize footer links with disabled Resources section
   const footerSections = [
     {
       title: "Products",
@@ -38,10 +37,10 @@ const Footer = () => {
     {
       title: "Resources",
       links: [
-        { name: "Documentation", path: "/docs", isExternal: true, url: "https://docs.mycow.exchange" },
-        { name: "API", path: "/api", isExternal: true, url: "https://api.mycow.exchange" },
-        { name: "Market Data", path: "/markets" }, // Redirecting to existing markets page
-        { name: "Market Status", path: "/status", isExternal: true, url: "https://status.mycow.exchange" },
+        { name: "Documentation", path: "/docs", isComingSoon: true },
+        { name: "API", path: "/api", isComingSoon: true },
+        { name: "Market Data", path: "/markets", isComingSoon: true }, 
+        { name: "Market Status", path: "/status", isComingSoon: true },
       ]
     },
     {
