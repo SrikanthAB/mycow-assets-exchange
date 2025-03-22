@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/auth";
 
 const MobileNavigation: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   
   return (
     <Sheet>
@@ -72,7 +72,7 @@ const MobileNavigation: React.FC = () => {
               <Button 
                 variant="ghost" 
                 className="w-full justify-start pl-2 text-sm text-destructive"
-                onClick={logout}
+                onClick={signOut}
               >
                 Sign out
               </Button>
