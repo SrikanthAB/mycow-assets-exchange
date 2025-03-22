@@ -5,6 +5,7 @@ import { Moon as MoonIcon, Sun as SunIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth";
 import { useTheme } from "@/components/ui/theme-provider";
+import UserProfileModal from "./UserProfileModal";
 
 interface HeaderLinkProps {
   to: string;
@@ -23,6 +24,7 @@ const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   
   const toggleMobileNav = () => {
     setIsMobileNavOpen(!isMobileNavOpen);
@@ -40,19 +42,28 @@ const Navbar = () => {
     setTheme(newTheme);
   };
   
+  const openProfileModal = () => {
+    if (user) {
+      setIsProfileModalOpen(true);
+    }
+  };
+  
   return (
     <header className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
+            <div 
+              className="flex items-center cursor-pointer" 
+              onClick={openProfileModal}
+            >
               <img 
                 src="/lovable-uploads/2357ba2d-c9c0-46f4-8848-6384dd15da4b.png" 
                 alt="MyCow Logo" 
                 className="h-8 w-auto mr-2" 
               />
               <span className="font-semibold text-xl">MyCow</span>
-            </Link>
+            </div>
             
             <nav className="hidden md:flex items-center ml-8 space-x-6">
               <HeaderLink to="/">Home</HeaderLink>
@@ -143,6 +154,12 @@ const Navbar = () => {
           </nav>
         </div>
       )}
+      
+      {/* User Profile Modal */}
+      <UserProfileModal 
+        open={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+      />
     </header>
   );
 };
