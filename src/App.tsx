@@ -27,6 +27,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 const queryClient = new QueryClient();
 
 function App() {
+  console.log("Rendering App component");
+  
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>

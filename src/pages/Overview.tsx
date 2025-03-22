@@ -5,12 +5,14 @@ import Footer from "@/components/Footer";
 import { PieChart, HistoryIcon, WalletIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Import the new component files
+// Import the component files
 import PortfolioSection from "@/components/overview/PortfolioSection";
 import WalletSection from "@/components/overview/WalletSection";
 import TransactionHistory from "@/components/overview/TransactionHistory";
 
 const Overview = () => {
+  console.log("Rendering Overview page");
+  
   return (
     <div className="min-h-screen">
       <Navbar />
