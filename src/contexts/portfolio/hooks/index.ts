@@ -1,5 +1,5 @@
 
 export * from './useTransactions';
-export * from './useTokens';
+export * from './tokens';
 export * from './useWallet';
 export * from './useLoans';
