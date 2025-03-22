@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,33 +33,46 @@ interface StakeTokenModalProps {
 }
 
 const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }: StakeTokenModalProps) => {
-  const [selectedToken, setSelectedToken] = useState<Token | null>(initialToken || (tokens.length > 0 ? tokens[0] : null));
-  const [amount, setAmount] = useState<number>(selectedToken?.balance || 0);
+  // Use initialToken if provided, otherwise use the first token from the list if available
+  const [selectedToken, setSelectedToken] = useState<Token | null>(
+    initialToken || (tokens.length > 0 ? tokens[0] : null)
+  );
+  
+  const [amount, setAmount] = useState<number>(0);
   const [autoCompound, setAutoCompound] = useState<boolean>(true);
   const [yieldRedirect, setYieldRedirect] = useState<boolean>(true);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const { toast } = useToast();
   const { toggleTokenStaking, addTransaction } = usePortfolio();
   
-  // Safely get the token
-  const token = selectedToken;
-  const currentYield = token?.yield ? parseFloat(token.yield.replace(/[^0-9.]/g, '')) : 0;
-  const strategyYield = strategy ? parseFloat(strategy.expectedReturn.split('-')[1]) : 0;
+  // Update amount when selectedToken changes
+  useEffect(() => {
+    if (selectedToken) {
+      setAmount(selectedToken.balance);
+    } else {
+      setAmount(0);
+    }
+  }, [selectedToken]);
+  
+  // Safely get the token yield rate
+  const currentYield = selectedToken?.yield 
+    ? parseFloat(selectedToken.yield.replace(/[^0-9.]/g, '')) 
+    : 0;
+    
+  const strategyYield = strategy 
+    ? parseFloat(strategy.expectedReturn.split('-')[1]) 
+    : 0;
+    
   const compoundBenefit = yieldRedirect ? (strategyYield - currentYield) : 0;
   
   // Handle token selection change
   const handleTokenChange = (tokenId: string) => {
     const newToken = tokens.find(t => t.id === tokenId) || null;
     setSelectedToken(newToken);
-    if (newToken) {
-      setAmount(newToken.balance);
-    } else {
-      setAmount(0);
-    }
   };
   
   const handleStake = async () => {
-    if (!token || !amount || amount <= 0 || amount > token.balance) return;
+    if (!selectedToken || !amount || amount <= 0 || amount > selectedToken.balance) return;
     
     setIsProcessing(true);
     
@@ -70,26 +83,26 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
         : `${currentYield || 5}% APY`;
       
       // Toggle token staking status
-      toggleTokenStaking(token.id, true, yieldRate);
+      toggleTokenStaking(selectedToken.id, true, yieldRate);
       
       // Add transaction record
       await addTransaction({
         type: 'stake',
-        asset: token.id,
+        asset: selectedToken.id,
         amount: amount,
-        value: token.price * amount,
+        value: selectedToken.price * amount,
         status: 'completed',
       });
       
       toast({
         title: "Tokens Staked Successfully",
-        description: `You have staked ${amount} ${token.symbol} tokens with ${autoCompound ? 'auto-compounding' : 'manual'} ${yieldRedirect && strategy ? `and yield redirected to ${strategy.name} strategy` : ''}`,
+        description: `You have staked ${amount} ${selectedToken.symbol} tokens with ${autoCompound ? 'auto-compounding' : 'manual'} ${yieldRedirect && strategy ? `and yield redirected to ${strategy.name} strategy` : ''}`,
       });
     } catch (error) {
       console.error("Error staking tokens:", error);
       toast({
         title: "Error Staking Tokens",
-        description: "There was an error unstaking your tokens. Please try again.",
+        description: "There was an error staking your tokens. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -114,8 +127,6 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
     );
   }
   
-  if (!token) return null;
-  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -130,12 +141,12 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
           <div>
             <label className="text-sm font-medium mb-2 block">Select Token</label>
             <Select
-              value={token.id}
+              value={selectedToken?.id || ''}
               onValueChange={handleTokenChange}
             >
               <SelectTrigger className="w-full">
-                <SelectValue>
-                  {token ? `${token.name} (${token.symbol})` : "Select a token"}
+                <SelectValue placeholder="Select a token to stake">
+                  {selectedToken ? `${selectedToken.name} (${selectedToken.symbol})` : "Select a token"}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -148,42 +159,46 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
             </Select>
           </div>
           
-          <div>
-            <label className="text-sm font-medium mb-2 block">Current Yield</label>
-            <div className="p-3 bg-muted rounded-md font-medium text-green-600">{token.yield || "0% APY"}</div>
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Amount to Stake
-            </label>
-            <Input
-              type="number"
-              min={0.1}
-              max={token.balance}
-              step={0.1}
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-            />
-            <div className="mt-1 text-xs text-muted-foreground flex justify-between">
-              <span>Available: {token.balance} {token.symbol}</span>
-              <button 
-                className="text-primary text-xs"
-                onClick={() => setAmount(token.balance)}
-              >
-                Max
-              </button>
-            </div>
-          </div>
-          
-          <div className="p-3 bg-muted/30 rounded-md">
-            <div className="flex justify-between">
-              <span>Estimated Annual Yield</span>
-              <span className="font-medium text-green-600">
-                ₹{((token.price * amount * currentYield) / 100).toLocaleString('en-IN', {maximumFractionDigits: 2})}
-              </span>
-            </div>
-          </div>
+          {selectedToken && (
+            <>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Current Yield</label>
+                <div className="p-3 bg-muted rounded-md font-medium text-green-600">{selectedToken.yield || "0% APY"}</div>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Amount to Stake
+                </label>
+                <Input
+                  type="number"
+                  min={0.1}
+                  max={selectedToken.balance}
+                  step={0.1}
+                  value={amount}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                />
+                <div className="mt-1 text-xs text-muted-foreground flex justify-between">
+                  <span>Available: {selectedToken.balance} {selectedToken.symbol}</span>
+                  <button 
+                    className="text-primary text-xs"
+                    onClick={() => setAmount(selectedToken.balance)}
+                  >
+                    Max
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-3 bg-muted/30 rounded-md">
+                <div className="flex justify-between">
+                  <span>Estimated Annual Yield</span>
+                  <span className="font-medium text-green-600">
+                    ₹{((selectedToken.price * amount * currentYield) / 100).toLocaleString('en-IN', {maximumFractionDigits: 2})}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
           
           <div className="space-y-4 pt-2">
             <div className="flex items-center justify-between space-x-2">
@@ -213,7 +228,7 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
             )}
           </div>
           
-          {yieldRedirect && strategy && (
+          {selectedToken && yieldRedirect && strategy && (
             <div className="bg-primary/5 p-3 rounded-md border border-primary/20">
               <h4 className="text-sm font-medium flex items-center">
                 <span>Current Yield</span>
@@ -237,7 +252,7 @@ const StakeTokenModal = ({ open, onOpenChange, tokens, initialToken, strategy }:
           </Button>
           <Button 
             onClick={handleStake} 
-            disabled={!amount || amount <= 0 || amount > token.balance || isProcessing}
+            disabled={!selectedToken || !amount || amount <= 0 || amount > (selectedToken?.balance || 0) || isProcessing}
             className={isProcessing ? "opacity-80" : ""}
           >
             {isProcessing ? "Processing..." : "Stake Tokens"}

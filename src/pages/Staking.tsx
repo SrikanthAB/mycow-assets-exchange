@@ -67,7 +67,10 @@ const Staking = () => {
       <main className="pt-24 pb-16">
         <section className="py-8 md:py-12">
           <div className="container mx-auto px-4">
-            <StakingHeader onStake={() => setIsStakeModalOpen(true)} />
+            <StakingHeader onStake={() => {
+              setSelectedToken(null); // Reset selected token to ensure dropdown shows all options
+              setIsStakeModalOpen(true);
+            }} />
             
             <StakingStats stakedTokens={stakedTokens} />
             
@@ -91,7 +94,7 @@ const Staking = () => {
         <StakeTokenModal 
           open={isStakeModalOpen}
           onOpenChange={setIsStakeModalOpen}
-          tokens={unstackedTokens}
+          tokens={unstackedTokens} // Passing all unstaked tokens to modal
           initialToken={selectedToken}
           strategy={yieldStrategies.find(s => s.id === selectedStrategy)}
         />
