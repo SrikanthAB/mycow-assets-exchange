@@ -1,21 +1,42 @@
 
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const navigate = useNavigate();
   
-  // Organize footer links, marking existing routes that are already implemented
+  // Handle link click with appropriate behavior based on link type
+  const handleLinkClick = (link: any, e: React.MouseEvent) => {
+    if (link.isComingSoon) {
+      e.preventDefault();
+      // Show toast notification for coming soon pages
+      toast({
+        title: "Coming Soon",
+        description: `The ${link.name} page is under development and will be available soon.`,
+        variant: "default",
+      });
+    } else if (link.isExternal && link.url) {
+      // External links open in a new tab, no need to prevent default
+    } else {
+      // For internal links, navigate programmatically and scroll to top
+      e.preventDefault();
+      navigate(link.path);
+      window.scrollTo(0, 0);
+    }
+  };
+  
+  // Organize footer links with the updated product section
   const footerSections = [
     {
       title: "Products",
       links: [
-        { name: "Overview", path: "/overview" }, // Changed from Assets to Overview
+        { name: "MyCow Layer 1", path: "/layer1", isComingSoon: true },
+        { name: "MyCow RWA's", path: "/rwas", isComingSoon: true },
+        { name: "MyCow Exchange", path: "/exchange", isComingSoon: true },
+        { name: "MyCow Stable Coin", path: "/stablecoin", isComingSoon: true },
         { name: "Markets", path: "/markets" }, // Existing route
-        { name: "Swaps", path: "/swaps" }, // Existing route
-        { name: "Staking", path: "/staking" }, // Existing route
-        { name: "IBPLs", path: "/ibpls" }, // Existing route
       ]
     },
     {
@@ -47,28 +68,6 @@ const Footer = () => {
       ]
     }
   ];
-
-  // Handle link click with appropriate behavior based on link type
-  const handleLinkClick = (link: any, e: React.MouseEvent) => {
-    if (link.isComingSoon) {
-      e.preventDefault();
-      // Show toast notification for coming soon pages
-      import('@/hooks/use-toast').then(({ toast }) => {
-        toast({
-          title: "Coming Soon",
-          description: `The ${link.name} page is under development and will be available soon.`,
-          variant: "default",
-        });
-      });
-    } else if (link.isExternal && link.url) {
-      // External links open in a new tab, no need to prevent default
-    } else {
-      // For internal links, navigate programmatically and scroll to top
-      e.preventDefault();
-      navigate(link.path);
-      window.scrollTo(0, 0);
-    }
-  };
   
   return (
     <footer className="bg-muted">
@@ -124,7 +123,7 @@ const Footer = () => {
                         onClick={(e) => handleLinkClick(link, e)}
                       >
                         {link.name}
-                        {link.isComingSoon && (
+                        {section.title === "Products" && link.isComingSoon && (
                           <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                             Soon
                           </span>
@@ -137,7 +136,7 @@ const Footer = () => {
                         onClick={(e) => handleLinkClick(link, e)}
                       >
                         {link.name}
-                        {link.isComingSoon && (
+                        {section.title === "Products" && link.isComingSoon && (
                           <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                             Soon
                           </span>
