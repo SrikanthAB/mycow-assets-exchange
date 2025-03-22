@@ -3,6 +3,7 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { usePortfolio } from "@/contexts/portfolio";
+import { useTheme } from "@/components/ui/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -22,8 +23,16 @@ import { FormEvent } from "react";
 const IBPLs = () => {
   
   const { tokens, getTotalPortfolioValue, getAvailablePortfolioValue, addLoan, repayLoan, loans, walletBalance } = usePortfolio();
-  const availablePortfolioValue = getAvailablePortfolioValue(); // Only use available value
+  const { theme } = useTheme();
   const { toast } = useToast();
+  
+  // Calculate already used collateral value
+  const usedCollateralValue = loans
+    .filter(loan => loan.status === 'active')
+    .reduce((total, loan) => total + loan.collateralValue, 0);
+  
+  // Calculate available portfolio value by subtracting used collateral
+  const availablePortfolioValue = getAvailablePortfolioValue() - usedCollateralValue;
   
   const [loanAmount, setLoanAmount] = useState<number>(0);
   const [collateralRatio, setCollateralRatio] = useState<number>(150);
@@ -109,7 +118,7 @@ const IBPLs = () => {
   };
   
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'}`}>
       <Navbar />
       
       <main className="pt-24 pb-16">
@@ -124,20 +133,20 @@ const IBPLs = () => {
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* New Loan Application */}
-              <div className="bg-[#0f172a] border border-blue-900/30 rounded-xl shadow-sm p-6">
-                <h3 className="text-xl font-medium mb-6 text-white">Apply for a New Loan</h3>
+              <div className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border'} rounded-xl shadow-sm p-6`}>
+                <h3 className="text-xl font-medium mb-6">Apply for a New Loan</h3>
                 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-300">Available Collateral</label>
-                    <div className="bg-[#1e293b] border border-blue-900/30 p-4 rounded-lg">
+                    <label className="block text-sm font-medium mb-2">Available Collateral</label>
+                    <div className={`${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30' : 'bg-gray-50 border'} p-4 rounded-lg`}>
                       <div className="flex justify-between mb-2">
                         <span className="text-muted-foreground">Available Portfolio Value</span>
-                        <span className="font-medium text-white">₹{availablePortfolioValue.toLocaleString('en-IN')}</span>
+                        <span className="font-medium">₹{availablePortfolioValue.toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Max Loan Available</span>
-                        <span className="font-medium text-white">₹{maxLoanAmount.toLocaleString('en-IN')}</span>
+                        <span className="font-medium">₹{maxLoanAmount.toLocaleString('en-IN')}</span>
                       </div>
                     </div>
                   </div>
@@ -218,7 +227,7 @@ const IBPLs = () => {
                     </div>
                   </div>
                   
-                  <div className="bg-muted/30 p-4 rounded-lg space-y-2">
+                  <div className={`${theme === 'dark' ? 'bg-muted/30' : 'bg-gray-50'} p-4 rounded-lg space-y-2`}>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Required Collateral</span>
                       <span className="font-medium">₹{requiredCollateral.toLocaleString('en-IN', {maximumFractionDigits: 0})}</span>
@@ -254,7 +263,7 @@ const IBPLs = () => {
                   )}
                   
                   <Button 
-                    className="w-full mt-4 bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white" 
+                    className={`w-full mt-4 ${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white' : ''}`}
                     disabled={loanAmount <= 0 || loanAmount > maxLoanAmount || !hasEnoughCollateral || availableTokens.length === 0}
                     onClick={handleApplyForLoan}
                   >
@@ -265,26 +274,26 @@ const IBPLs = () => {
               
               {/* Active Loans */}
               <div>
-                <h3 className="text-xl font-medium mb-6 text-white">Active Loans</h3>
+                <h3 className="text-xl font-medium mb-6">Active Loans</h3>
                 
                 {loans.filter(loan => loan.status === 'active').length === 0 ? (
-                  <div className="bg-[#0f172a] border border-blue-900/30 rounded-xl shadow-sm p-6 text-center">
+                  <div className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border'} rounded-xl shadow-sm p-6 text-center`}>
                     <p className="text-muted-foreground">You don't have any active loans.</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {loans.filter(loan => loan.status === 'active').map(loan => (
-                      <div key={loan.id} className="bg-[#0f172a] border border-blue-900/30 rounded-xl shadow-sm p-6">
+                      <div key={loan.id} className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : 'bg-white border'} rounded-xl shadow-sm p-6`}>
                         <div className="flex justify-between items-start mb-4">
                           <div>
                             <Badge variant="outline" className="mb-2">Active</Badge>
-                            <h4 className="text-lg font-medium text-white">₹{loan.amount.toLocaleString('en-IN')}</h4>
+                            <h4 className="text-lg font-medium">₹{loan.amount.toLocaleString('en-IN')}</h4>
                             <p className="text-sm text-muted-foreground">{loan.remainingDays} days remaining</p>
                           </div>
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white"
+                            className={`${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white' : ''}`}
                             onClick={() => {
                               setSelectedLoanId(loan.id);
                               setRepayDialogOpen(true);
@@ -322,13 +331,13 @@ const IBPLs = () => {
                   </div>
                 )}
                 
-                <div className="mt-8 bg-[#1e293b] border border-blue-900/30 rounded-xl p-6">
+                <div className={`mt-8 ${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30' : 'bg-white border border-gray-200'} rounded-xl p-6`}>
                   <div className="flex items-start">
                     <div className="mr-4 p-2 bg-primary/10 rounded-lg">
                       <Calculator className="text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-white">Need help planning your loan?</h4>
+                      <h4 className="font-medium">Need help planning your loan?</h4>
                       <p className="text-sm text-muted-foreground mt-1">
                         Our loan calculator can help you estimate payments and find the best terms for your situation.
                       </p>
@@ -345,7 +354,7 @@ const IBPLs = () => {
       </main>
       
       <Dialog open={repayDialogOpen} onOpenChange={setRepayDialogOpen}>
-        <DialogContent className="bg-[#0f172a] border border-blue-900/30 text-white">
+        <DialogContent className={`${theme === 'dark' ? 'bg-[#0f172a] border border-blue-900/30' : ''}`}>
           <DialogHeader>
             <DialogTitle>Repay Loan</DialogTitle>
             <DialogDescription>
@@ -356,17 +365,28 @@ const IBPLs = () => {
           <div className="py-4">
             <div className="flex justify-between mb-2">
               <span className="text-muted-foreground">Repayment Amount</span>
-              <span className="font-medium text-white">₹{getRepaymentAmount(selectedLoanId).toLocaleString('en-IN')}</span>
+              <span className="font-medium">₹{getRepaymentAmount(selectedLoanId).toLocaleString('en-IN')}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Your Wallet Balance</span>
-              <span className="font-medium text-white">₹{walletBalance.toLocaleString('en-IN')}</span>
+              <span className="font-medium">₹{walletBalance.toLocaleString('en-IN')}</span>
             </div>
           </div>
           
           <DialogFooter>
-            <Button variant="outline" className="bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white" onClick={() => setRepayDialogOpen(false)}>Cancel</Button>
-            <Button className="bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white" onClick={handleRepayLoan}>Repay Loan</Button>
+            <Button 
+              variant="outline" 
+              className={`${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white' : ''}`} 
+              onClick={() => setRepayDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              className={`${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30 hover:bg-[#0f172a] text-white' : ''}`}
+              onClick={handleRepayLoan}
+            >
+              Repay Loan
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
