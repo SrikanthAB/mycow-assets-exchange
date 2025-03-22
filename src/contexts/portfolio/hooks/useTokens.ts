@@ -1,26 +1,77 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Token } from "../types";
 import { initialTokens } from "../initialData";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useTokens = () => {
   const [tokens, setTokens] = useState<Token[]>(initialTokens);
 
-  // Update initial tokens to reflect locked gold
-  useEffect(() => {
-    setTokens(prev => 
-      prev.map(token => 
-        token.id === "digital-gold" 
-          ? { 
-              ...token, 
-              locked: true, 
-              lockedAmount: 0.1,
-              loanId: "loan1"
-            } 
-          : token
-      )
-    );
-  }, []);
+  // Load tokens from Supabase
+  const loadTokensFromStorage = async (): Promise<Token[] | null> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return null;
+      
+      // Try to get tokens from user metadata
+      const { data, error } = await supabase
+        .from('user_portfolio')
+        .select('tokens')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) {
+        // If no data exists yet, return null
+        if (error.code === 'PGRST116') return null;
+        throw error;
+      }
+      
+      return data?.tokens || null;
+    } catch (error) {
+      console.error('Error loading tokens:', error);
+      return null;
+    }
+  };
+
+  // Save tokens to Supabase
+  const saveTokensToStorage = async (tokensToSave: Token[]) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return;
+      
+      // Check if user record exists
+      const { data, error: selectError } = await supabase
+        .from('user_portfolio')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (selectError && selectError.code !== 'PGRST116') {
+        throw selectError;
+      }
+      
+      if (data) {
+        // Update existing record
+        const { error } = await supabase
+          .from('user_portfolio')
+          .update({ tokens: tokensToSave })
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+      } else {
+        // Insert new record
+        const { error } = await supabase
+          .from('user_portfolio')
+          .insert({ user_id: user.id, tokens: tokensToSave });
+        
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error('Error saving tokens:', error);
+    }
+  };
 
   const addToken = (token: Token) => {
     setTokens(prev => [...prev, token]);
@@ -90,6 +141,7 @@ export const useTokens = () => {
 
   return {
     tokens,
+    setTokens,
     addToken,
     removeToken,
     updateTokenBalance,
@@ -97,6 +149,8 @@ export const useTokens = () => {
     unlockToken,
     getTokenByLoanId,
     getTotalPortfolioValue,
-    getAvailablePortfolioValue
+    getAvailablePortfolioValue,
+    loadTokensFromStorage,
+    saveTokensToStorage
   };
 };
