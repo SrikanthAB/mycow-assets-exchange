@@ -10,7 +10,7 @@ import Index from './pages/Index';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Markets from './pages/Markets';
-import Assets from './pages/Assets';
+import Overview from './pages/Overview';
 import Swaps from './pages/Swaps';
 import IBPLs from './pages/IBPLs';
 import NotFound from './pages/NotFound';
@@ -45,7 +45,7 @@ function App() {
                   
                   {/* Protected Routes */}
                   <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
-                    <Route path="/assets" element={<Assets />} />
+                    <Route path="/overview" element={<Overview />} />
                     <Route path="/swaps" element={<Swaps />} />
                     <Route path="/ibpls" element={<IBPLs />} />
                   </Route>
