@@ -44,6 +44,7 @@ export type Database = {
           date: string
           id: string
           status: string
+          to_asset: string | null
           type: string
           user_id: string | null
           value: number
@@ -55,6 +56,7 @@ export type Database = {
           date?: string
           id?: string
           status: string
+          to_asset?: string | null
           type: string
           user_id?: string | null
           value: number
@@ -66,6 +68,7 @@ export type Database = {
           date?: string
           id?: string
           status?: string
+          to_asset?: string | null
           type?: string
           user_id?: string | null
           value?: number

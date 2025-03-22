@@ -28,7 +28,7 @@ export const fetchTransactions = async () => {
     const formattedTransactions: Transaction[] = data.map(item => ({
       id: item.id,
       date: item.date,
-      type: item.type as 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock' | 'loan' | 'repayment',
+      type: item.type as 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock' | 'loan' | 'repayment' | 'stake' | 'unstake' | 'swap',
       asset: item.asset,
       amount: Number(item.amount),
       value: Number(item.value),
