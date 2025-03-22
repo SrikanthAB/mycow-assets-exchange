@@ -16,9 +16,9 @@ export function ThemeProvider({
   children, 
   ...props 
 }: ThemeProviderProps) {
-  // Set default theme to dark
+  // Set default theme to light
   useEffect(() => {
-    const savedTheme = localStorage.getItem("mycow-theme-preference") || "dark"
+    const savedTheme = localStorage.getItem("mycow-theme-preference") || "light"
     document.documentElement.classList.add(savedTheme)
     localStorage.setItem("mycow-theme-preference", savedTheme)
   }, [])
@@ -70,11 +70,11 @@ export const useTheme = () => {
   const context = useContext(ThemeContext)
   if (context === undefined) {
     // Use a default implementation if outside provider
-    const [theme, setThemeState] = useState<string>("dark")
+    const [theme, setThemeState] = useState<string>("light")
     
     useEffect(() => {
       // Check for system preference or stored preference
-      const savedTheme = localStorage.getItem("mycow-theme-preference") || "dark"
+      const savedTheme = localStorage.getItem("mycow-theme-preference") || "light"
       setThemeState(savedTheme)
       
       if (savedTheme === "dark") {

@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/contexts/portfolio";
-import { InfoCircle } from "lucide-react";
+import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PortfolioSummaryProps {
@@ -29,7 +29,7 @@ const PortfolioSummary = ({ totalValue }: PortfolioSummaryProps) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <InfoCircle size={14} className="ml-1 text-muted-foreground" />
+                      <Info size={14} className="ml-1 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-xs max-w-56">This is the value of your portfolio excluding assets locked as collateral for loans</p>
