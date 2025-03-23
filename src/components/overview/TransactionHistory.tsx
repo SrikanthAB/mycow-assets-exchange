@@ -20,22 +20,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
 
 const TransactionHistory = () => {
-  const { transactions, isLoading, addTransaction } = usePortfolio();
+  const { transactions, isLoading, loadTransactions } = usePortfolio();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
   
-  // Get loadTransactions from the useTransactions hook
-  const loadTransactions = async () => {
+  // Function to refresh the transaction list
+  const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      // Force re-render by adding a dummy transaction that will be filtered out
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        window.location.reload(); // Simple approach to force full refresh
-      }
+      await loadTransactions();
+      toast({
+        title: "Refreshed",
+        description: "Transaction history has been refreshed.",
+      });
     } catch (error) {
       console.error("Error refreshing transactions:", error);
       toast({
@@ -140,7 +139,7 @@ const TransactionHistory = () => {
           <Button 
             variant="outline" 
             className="flex items-center gap-2"
-            onClick={loadTransactions}
+            onClick={handleRefresh}
             disabled={isRefreshing}
           >
             {isRefreshing ? (

@@ -25,7 +25,7 @@ export const fetchTransactions = async () => {
       throw error;
     }
     
-    console.log('Retrieved transactions from Supabase:', data?.length || 0);
+    console.log(`Retrieved ${data?.length || 0} transactions from Supabase for user ${user.id}`);
     
     // Transform data to match our Transaction interface
     const formattedTransactions: Transaction[] = data?.map(item => ({

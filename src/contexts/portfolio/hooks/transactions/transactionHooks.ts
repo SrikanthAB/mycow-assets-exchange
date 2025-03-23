@@ -5,6 +5,7 @@ import { fetchTransactions, saveTransaction } from "../../portfolioService";
 import { useToast } from "@/components/ui/use-toast";
 import { getAuthenticatedUser, notifyTransaction, logTransaction } from "./transactionUtils";
 import { seedInitialTransactions as seedTransactions } from "./seedTransactions";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Hook for managing transactions
@@ -52,16 +53,42 @@ export const useTransactions = () => {
     }
   };
 
-  // Fetch transactions from Supabase on component mount
+  // Fetch transactions from Supabase on component mount and when user changes
   useEffect(() => {
     console.log("useTransactions effect running");
+    
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
+      console.log("Auth state changed in useTransactions:", event);
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        await loadTransactions();
+      } else if (event === 'SIGNED_OUT') {
+        setTransactions([]);
+      }
+    });
+    
+    // Initial load
     loadTransactions();
-  }, [toast]);
+    
+    // Cleanup
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Add transaction to history and save to Supabase
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
     try {
       logTransaction("Saving transaction to Supabase:", transaction);
+      
+      // Check if user is authenticated
+      const user = await getAuthenticatedUser();
+      if (!user) {
+        const error = new Error("User must be authenticated to save transactions");
+        console.error(error);
+        notifyTransaction(toast, false);
+        throw error;
+      }
       
       // First save to Supabase to ensure it gets stored in the database
       const savedTransaction = await saveTransaction(transaction);
