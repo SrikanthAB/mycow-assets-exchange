@@ -48,31 +48,55 @@ const AddFundsModal = ({ isOpen, onClose }: AddFundsModalProps) => {
     
     // Simulate transaction processing
     setTimeout(() => {
-      const numericAmount = parseFloat(amount);
-      
-      // Add funds to wallet
-      addFunds(numericAmount);
-      
-      // Add transaction to history
-      addTransaction({
-        type: 'deposit',
-        asset: 'INR',
-        amount: numericAmount,
-        value: numericAmount,
-        status: 'completed'
-      });
-      
-      // Show success message
-      toast({
-        title: "Funds added successfully",
-        description: `₹${numericAmount.toLocaleString('en-IN')} has been added to your wallet.`,
-      });
-      
-      // Reset form and close modal
-      setAmount("");
-      setUpiId("");
-      setIsProcessing(false);
-      onClose();
+      try {
+        const numericAmount = parseFloat(amount);
+        
+        console.log("Adding funds:", numericAmount);
+        
+        // Add funds to wallet
+        addFunds(numericAmount);
+        
+        console.log("Funds added to wallet, now adding transaction");
+        
+        // Add transaction to history
+        addTransaction({
+          type: 'deposit',
+          asset: 'INR',
+          amount: numericAmount,
+          value: numericAmount,
+          status: 'completed'
+        }).then(() => {
+          console.log("Transaction added successfully");
+          
+          // Show success message
+          toast({
+            title: "Funds added successfully",
+            description: `₹${numericAmount.toLocaleString('en-IN')} has been added to your wallet.`,
+          });
+          
+          // Reset form and close modal
+          setAmount("");
+          setUpiId("");
+          setIsProcessing(false);
+          onClose();
+        }).catch(error => {
+          console.error("Error adding transaction:", error);
+          toast({
+            title: "Error adding funds",
+            description: "There was an error processing your transaction. Please try again.",
+            variant: "destructive"
+          });
+          setIsProcessing(false);
+        });
+      } catch (error) {
+        console.error("Error in handleAddFunds:", error);
+        toast({
+          title: "Error adding funds",
+          description: "There was an error processing your transaction. Please try again.",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+      }
     }, 1500);
   };
   

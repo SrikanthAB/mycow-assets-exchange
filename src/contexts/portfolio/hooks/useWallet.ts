@@ -9,9 +9,15 @@ export const useWallet = () => {
   // Load wallet balance from Supabase
   const loadWalletBalance = async (): Promise<number | null> => {
     try {
+      console.log("Loading wallet balance from Supabase");
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) return null;
+      if (!user) {
+        console.log("No authenticated user found when loading wallet balance");
+        return null;
+      }
+      
+      console.log("Fetching wallet balance for user:", user.id);
       
       // Use raw query to get around type limitations
       const { data, error } = await supabase
@@ -22,10 +28,14 @@ export const useWallet = () => {
       
       if (error) {
         // If no data exists yet, return null
-        if (error.code === 'PGRST116') return null;
+        if (error.code === 'PGRST116') {
+          console.log("No wallet balance found for this user, returning null");
+          return null;
+        }
         throw error;
       }
       
+      console.log("Wallet balance loaded:", data?.wallet_balance);
       return data?.wallet_balance !== undefined ? Number(data.wallet_balance) : null;
     } catch (error) {
       console.error('Error loading wallet balance:', error);
@@ -36,9 +46,13 @@ export const useWallet = () => {
   // Save wallet balance to Supabase
   const saveWalletBalance = async (balance: number) => {
     try {
+      console.log("Saving wallet balance to Supabase:", balance);
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) return;
+      if (!user) {
+        console.log("No authenticated user found when saving wallet balance");
+        return;
+      }
       
       // Check if user record exists
       const { data, error: selectError } = await supabase
@@ -53,14 +67,17 @@ export const useWallet = () => {
       
       if (data) {
         // Update existing record
+        console.log("Updating existing wallet balance record");
         const { error } = await supabase
           .from('user_portfolio')
           .update({ wallet_balance: balance })
           .eq('user_id', user.id);
         
         if (error) throw error;
+        console.log("Wallet balance updated successfully");
       } else {
         // Insert new record
+        console.log("Creating new wallet balance record");
         const { error } = await supabase
           .from('user_portfolio')
           .insert({ 
@@ -69,6 +86,7 @@ export const useWallet = () => {
           });
         
         if (error) throw error;
+        console.log("New wallet balance record created successfully");
       }
     } catch (error) {
       console.error('Error saving wallet balance:', error);
@@ -77,15 +95,26 @@ export const useWallet = () => {
 
   // Add funds to wallet
   const addFunds = (amount: number) => {
-    setWalletBalance(prev => prev + amount);
+    console.log("Adding funds to wallet:", amount);
+    setWalletBalance(prev => {
+      const newBalance = prev + amount;
+      console.log("New wallet balance:", newBalance);
+      return newBalance;
+    });
   };
 
   // Deduct funds from wallet, returns true if successful, false if insufficient funds
   const deductFunds = (amount: number) => {
+    console.log("Attempting to deduct funds:", amount, "Current balance:", walletBalance);
     if (walletBalance >= amount) {
-      setWalletBalance(prev => prev - amount);
+      setWalletBalance(prev => {
+        const newBalance = prev - amount;
+        console.log("New wallet balance after deduction:", newBalance);
+        return newBalance;
+      });
       return true;
     }
+    console.log("Insufficient funds for deduction");
     return false;
   };
 

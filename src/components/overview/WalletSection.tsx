@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePortfolio } from "@/contexts/portfolio/usePortfolio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,13 @@ const WalletSection = () => {
   const totalValue = getTotalPortfolioValue();
   const { theme } = useTheme();
   const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState(false);
+  const [currentBalance, setCurrentBalance] = useState(walletBalance);
+
+  // Update current balance when wallet balance changes
+  useEffect(() => {
+    console.log("Wallet balance updated in WalletSection:", walletBalance);
+    setCurrentBalance(walletBalance);
+  }, [walletBalance]);
 
   return (
     <>
@@ -25,7 +32,7 @@ const WalletSection = () => {
           <div className="grid gap-6">
             <div className={`${theme === 'dark' ? 'bg-[#1e293b] border border-blue-900/30' : 'bg-muted/30'} rounded-xl p-6`}>
               <h3 className="text-muted-foreground text-sm font-medium">Available Balance</h3>
-              <div className="text-3xl font-bold mt-1">₹{walletBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+              <div className="text-3xl font-bold mt-1">₹{currentBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4">
