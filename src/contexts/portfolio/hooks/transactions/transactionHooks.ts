@@ -90,6 +90,7 @@ export const useTransactions = () => {
     transactions,
     isLoading,
     addTransaction,
+    loadTransactions, // Export loadTransactions for manual refresh
     seedInitialTransactions
   };
 };

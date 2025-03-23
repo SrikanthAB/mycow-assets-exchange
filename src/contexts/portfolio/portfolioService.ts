@@ -4,6 +4,7 @@ import { Transaction } from "./types";
 
 export const fetchTransactions = async () => {
   try {
+    console.log("Fetching transactions from Supabase");
     // Get the current user
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -24,10 +25,10 @@ export const fetchTransactions = async () => {
       throw error;
     }
     
-    console.log('Retrieved transactions from Supabase:', data);
+    console.log('Retrieved transactions from Supabase:', data?.length || 0);
     
     // Transform data to match our Transaction interface
-    const formattedTransactions: Transaction[] = data.map(item => ({
+    const formattedTransactions: Transaction[] = data?.map(item => ({
       id: item.id,
       date: item.date,
       type: item.type as 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock' | 'loan' | 'repayment' | 'stake' | 'unstake' | 'swap',
@@ -36,7 +37,7 @@ export const fetchTransactions = async () => {
       value: Number(item.value),
       status: item.status as 'completed' | 'pending' | 'failed',
       toAsset: item.to_asset
-    }));
+    })) || [];
     
     return formattedTransactions;
   } catch (error) {
@@ -47,6 +48,7 @@ export const fetchTransactions = async () => {
 
 export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
   try {
+    console.log('Saving transaction to Supabase:', transaction);
     // Get the current user
     const { data: { user } } = await supabase.auth.getUser();
     

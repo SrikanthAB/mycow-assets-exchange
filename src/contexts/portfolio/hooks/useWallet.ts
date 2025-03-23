@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { initialWalletBalance } from "../initialData";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useWallet = () => {
@@ -99,6 +98,8 @@ export const useWallet = () => {
     setWalletBalance(prev => {
       const newBalance = prev + amount;
       console.log("New wallet balance:", newBalance);
+      // Save the updated balance to Supabase
+      saveWalletBalance(newBalance);
       return newBalance;
     });
   };
@@ -110,6 +111,8 @@ export const useWallet = () => {
       setWalletBalance(prev => {
         const newBalance = prev - amount;
         console.log("New wallet balance after deduction:", newBalance);
+        // Save the updated balance to Supabase
+        saveWalletBalance(newBalance);
         return newBalance;
       });
       return true;

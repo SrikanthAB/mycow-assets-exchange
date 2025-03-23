@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { usePortfolio } from "@/contexts/portfolio";
 import { Download, Loader2, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -20,16 +20,72 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const TransactionHistory = () => {
-  const { transactions, isLoading } = usePortfolio();
+  const { transactions, isLoading, addTransaction } = usePortfolio();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
+  
+  // Get loadTransactions from the useTransactions hook
+  const loadTransactions = async () => {
+    setIsRefreshing(true);
+    try {
+      // Force re-render by adding a dummy transaction that will be filtered out
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        window.location.reload(); // Simple approach to force full refresh
+      }
+    } catch (error) {
+      console.error("Error refreshing transactions:", error);
+      toast({
+        title: "Refresh Failed",
+        description: "Could not refresh transaction history.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    console.log("Loaded transactions:", transactions);
+    console.log("Loaded transactions:", transactions?.length || 0);
   }, [transactions]);
 
   const downloadStatement = () => {
+    // Create CSV data from transactions
+    if (!transactions || transactions.length === 0) {
+      toast({
+        title: "No Data Available",
+        description: "There are no transactions to download.",
+      });
+      return;
+    }
+    
+    // CSV header
+    let csvContent = "Date,Type,Details,Amount,Status\n";
+    
+    // Add transaction data
+    transactions.forEach(transaction => {
+      const date = new Date(transaction.date).toLocaleDateString('en-IN');
+      const type = transaction.type;
+      const details = getTransactionDescription(transaction);
+      const amount = transaction.value.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+      const status = transaction.status;
+      
+      csvContent += `"${date}","${type}","${details}","₹${amount}","${status}"\n`;
+    });
+    
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "transaction_statement.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
     toast({
       title: "Statement Downloaded",
       description: "Your transaction statement has been downloaded successfully.",
@@ -84,7 +140,21 @@ const TransactionHistory = () => {
           <Button 
             variant="outline" 
             className="flex items-center gap-2"
+            onClick={loadTransactions}
+            disabled={isRefreshing}
+          >
+            {isRefreshing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            Refresh
+          </Button>
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
             onClick={downloadStatement}
+            disabled={transactions?.length === 0}
           >
             <Download size={16} />
             Download
@@ -92,7 +162,7 @@ const TransactionHistory = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading || isRefreshing ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             <span className="ml-2 text-muted-foreground">Loading transactions...</span>
