@@ -94,7 +94,8 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
             console.log("Loaded user tokens:", userTokens.length);
             setTokens(userTokens);
           } else {
-            console.log("No tokens found in storage, using initial tokens");
+            console.log("No tokens found in storage, using empty token list for new user");
+            setTokens([]);
           }
           
           const userWalletBalance = await loadWalletBalance();
@@ -102,7 +103,8 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
             console.log("Loaded wallet balance:", userWalletBalance);
             setWalletBalance(userWalletBalance);
           } else {
-            console.log("No wallet balance found, using initial balance");
+            console.log("No wallet balance found, setting to zero");
+            setWalletBalance(0);
           }
         } else {
           console.log("No authenticated user found");

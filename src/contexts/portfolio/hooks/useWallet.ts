@@ -4,7 +4,7 @@ import { initialWalletBalance } from "../initialData";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useWallet = () => {
-  const [walletBalance, setWalletBalance] = useState<number>(initialWalletBalance);
+  const [walletBalance, setWalletBalance] = useState<number>(0); // Default to 0 instead of initialWalletBalance
 
   // Load wallet balance from Supabase
   const loadWalletBalance = async (): Promise<number | null> => {
