@@ -10,19 +10,8 @@ export const useLoans = (
   deductFunds: (amount: number) => boolean,
   getTokenByLoanId: (loanId: string) => any
 ) => {
-  const [loans, setLoans] = useState<Loan[]>([{
-    id: "loan1",
-    amount: 10000,
-    collateralToken: "digital-gold",
-    collateralAmount: 0.1,
-    collateralValue: 15000,
-    collateralRatio: 150,
-    interestRate: 9.5,
-    term: 90,
-    startDate: "2023-12-15",
-    remainingDays: 45,
-    status: 'active'
-  }]);
+  // Initialize with an empty loans array instead of sample data
+  const [loans, setLoans] = useState<Loan[]>([]);
 
   // Add a new loan
   const addLoan = (loan: Omit<Loan, 'id'>) => {
