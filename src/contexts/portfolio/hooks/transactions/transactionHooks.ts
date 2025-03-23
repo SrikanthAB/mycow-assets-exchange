@@ -11,6 +11,7 @@ import { seedInitialTransactions as seedTransactions } from "./seedTransactions"
  * @returns Object with transaction state and operations
  */
 export const useTransactions = () => {
+  console.log("Initializing useTransactions hook");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast } = useToast();
@@ -18,6 +19,7 @@ export const useTransactions = () => {
   // Function to load transactions from Supabase
   const loadTransactions = async () => {
     try {
+      console.log("Starting to load transactions");
       setIsLoading(true);
       
       // Check if user is authenticated
@@ -46,11 +48,13 @@ export const useTransactions = () => {
       setTransactions([]);
     } finally {
       setIsLoading(false);
+      console.log("Finished loading transactions");
     }
   };
 
   // Fetch transactions from Supabase on component mount
   useEffect(() => {
+    console.log("useTransactions effect running");
     loadTransactions();
   }, [toast]);
 
@@ -72,7 +76,7 @@ export const useTransactions = () => {
     } catch (error) {
       console.error('Error in addTransaction:', error);
       notifyTransaction(toast, false);
-      throw error; // Re-throw to allow handling in UI components
+      throw error;
     }
   };
 
@@ -81,6 +85,7 @@ export const useTransactions = () => {
     await seedTransactions(toast, loadTransactions);
   };
 
+  console.log("Returning useTransactions hook data");
   return {
     transactions,
     isLoading,
