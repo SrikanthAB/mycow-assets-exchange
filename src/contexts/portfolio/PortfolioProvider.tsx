@@ -1,4 +1,3 @@
-
 import React, { createContext, ReactNode, useEffect, useState } from "react";
 import { PortfolioContextType } from "./types";
 import { useTransactions, useTokens, useWallet, useLoans } from "./hooks";
@@ -197,7 +196,8 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
       repayLoan,
       isLoading,
       toggleTokenStaking,
-      seedInitialTransactions
+      seedInitialTransactions,
+      loadTransactions // Add the loadTransactions function to the context
     }}>
       {children}
     </PortfolioContext.Provider>

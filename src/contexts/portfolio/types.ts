@@ -64,4 +64,5 @@ export interface PortfolioContextType {
   isLoading: boolean;
   toggleTokenStaking: (id: string, isStaked: boolean, yieldRate?: string) => void;
   seedInitialTransactions?: () => Promise<void>;
+  loadTransactions: () => Promise<void>; // Add this missing function
 }
