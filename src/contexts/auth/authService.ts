@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface AuthResult {
   success: boolean;
@@ -31,6 +32,7 @@ export const authService = {
       
       if (signInError) throw signInError;
       
+      toast.success("Account created successfully!");
       return { success: true };
     }
     
@@ -50,6 +52,7 @@ export const authService = {
       throw error;
     }
     
+    toast.success("Signed in successfully!");
     return { success: true };
   },
   
@@ -64,6 +67,7 @@ export const authService = {
 
     if (error) throw error;
     
+    toast.success("Confirmation email sent. Please check your inbox.");
     return { success: true };
   },
   
@@ -71,6 +75,7 @@ export const authService = {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     
+    toast.success("Signed out successfully");
     return { success: true };
   }
 };

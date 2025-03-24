@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,6 +34,7 @@ export const LoginForm = ({
   const { signIn, resendConfirmationEmail } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -49,7 +50,13 @@ export const LoginForm = ({
     setShowResendOption(false);
     
     try {
-      await signIn(data.email, data.password);
+      const result = await signIn(data.email, data.password);
+      if (result.success) {
+        navigate("/");
+      } else if (result.emailNotConfirmed) {
+        setError("Your email is not confirmed. Please check your inbox or resend the confirmation email.");
+        setShowResendOption(true);
+      }
     } catch (err: any) {
       setError(err.message || "Failed to login. Please check your credentials.");
       if (err.message?.includes("not confirmed")) {

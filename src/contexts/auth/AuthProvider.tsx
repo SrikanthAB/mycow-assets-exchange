@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AuthContext } from "./AuthContext";
@@ -11,7 +10,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -32,7 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               title: "Email verified successfully",
               description: "Your email has been verified and you're now logged in.",
             });
-            navigate('/');
           }
         } catch (error: any) {
           console.error("Email confirmation error:", error);
@@ -84,92 +81,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast, navigate]);
-
-  const signUp = async (email: string, password: string, fullName: string) => {
-    try {
-      // Use the authService to handle signup
-      const result = await authService.signUp(email, password, fullName);
-      
-      if (result.success) {
-        toast({
-          title: "Account created",
-          description: "Your account has been created and you're now signed in.",
-        });
-        navigate("/");
-      }
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "An error occurred during signup.",
-      });
-      throw error;
-    }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const result = await authService.signIn(email, password);
-      
-      if (result.success) {
-        navigate("/");
-      } else if (result.emailNotConfirmed) {
-        toast({
-          variant: "destructive",
-          title: "Email not confirmed",
-          description: "Please check your email for the confirmation link or resend the confirmation email.",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Invalid login credentials.",
-      });
-      throw error;
-    }
-  };
-
-  const resendConfirmationEmail = async (email: string) => {
-    try {
-      await authService.resendConfirmationEmail(email);
-      
-      toast({
-        title: "Confirmation email sent",
-        description: "Please check your inbox for the confirmation link.",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to resend confirmation email.",
-      });
-      throw error;
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      await authService.signOut();
-      navigate("/");
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "An error occurred during sign out.",
-      });
-    }
-  };
+  }, [toast]);
 
   const value = {
     session,
     user,
     loading,
-    signUp,
-    signIn,
-    signOut,
-    resendConfirmationEmail,
+    signUp: authService.signUp,
+    signIn: authService.signIn,
+    signOut: authService.signOut,
+    resendConfirmationEmail: authService.resendConfirmationEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

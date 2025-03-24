@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -26,6 +27,7 @@ import { PortfolioProvider } from './contexts/portfolio';
 
 // Import components
 import ProtectedRoute from './components/ProtectedRoute';
+import { AuthNavigationHandler } from './contexts/auth/AuthNavigationHandler';
 
 const queryClient = new QueryClient();
 
@@ -35,9 +37,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="mycow-theme-preference">
-        <AuthProvider>
-          <PortfolioProvider>
-            <BrowserRouter>
+        <BrowserRouter>
+          <AuthProvider>
+            <AuthNavigationHandler />
+            <PortfolioProvider>
               <Routes>
                 {/* Home route with Footer */}
                 <Route element={<HomeLayout />}>
@@ -64,10 +67,10 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>
-            </BrowserRouter>
-            <Toaster />
-          </PortfolioProvider>
-        </AuthProvider>
+              <Toaster />
+            </PortfolioProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );

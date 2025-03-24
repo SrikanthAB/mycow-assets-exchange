@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,6 +34,7 @@ const Register = () => {
   const { signUp } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -50,8 +51,10 @@ const Register = () => {
     setError(null);
     
     try {
-      await signUp(data.email, data.password, data.fullName);
-      // The navigation to home page is handled in the signUp function now
+      const result = await signUp(data.email, data.password, data.fullName);
+      if (result.success) {
+        navigate('/');
+      }
     } catch (err: any) {
       setError(err.message || "Failed to create account. Please try again.");
     } finally {
