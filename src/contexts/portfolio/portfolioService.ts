@@ -2,6 +2,20 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Transaction } from "./types";
 
+// Cache for transactions to avoid redundant fetches
+let transactionCache: { 
+  userId: string | null,
+  data: Transaction[], 
+  timestamp: number 
+} = { 
+  userId: null, 
+  data: [], 
+  timestamp: 0 
+};
+
+// Cache expiration time in milliseconds (5 minutes)
+const CACHE_EXPIRATION = 5 * 60 * 1000;
+
 export const fetchTransactions = async () => {
   try {
     console.log("Fetching transactions from Supabase");
@@ -13,7 +27,18 @@ export const fetchTransactions = async () => {
       return [];
     }
     
-    // Fetch transactions specifically for this user
+    // Check if we have valid cached data for this user
+    const now = Date.now();
+    if (
+      transactionCache.userId === user.id && 
+      transactionCache.data.length > 0 && 
+      now - transactionCache.timestamp < CACHE_EXPIRATION
+    ) {
+      console.log("Using cached transactions data");
+      return transactionCache.data;
+    }
+    
+    // Fetch transactions specifically for this user with optimized query
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
@@ -38,6 +63,13 @@ export const fetchTransactions = async () => {
       status: item.status as 'completed' | 'pending' | 'failed',
       toAsset: item.to_asset
     })) || [];
+    
+    // Update the cache
+    transactionCache = {
+      userId: user.id,
+      data: formattedTransactions,
+      timestamp: now
+    };
     
     return formattedTransactions;
   } catch (error) {
@@ -83,8 +115,8 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
     
     console.log('Transaction saved successfully in Supabase:', data);
     
-    // Return the created transaction data
-    return {
+    // Format the created transaction
+    const formattedTransaction: Transaction = {
       id: data.id,
       date: data.date,
       type: data.type as 'buy' | 'sell' | 'deposit' | 'withdrawal' | 'lock' | 'unlock' | 'loan' | 'repayment' | 'stake' | 'unstake' | 'swap',
@@ -94,6 +126,14 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
       status: data.status as 'completed' | 'pending' | 'failed',
       toAsset: data.to_asset
     };
+    
+    // Update the cache with the new transaction
+    if (transactionCache.userId === user.id) {
+      transactionCache.data = [formattedTransaction, ...transactionCache.data];
+      transactionCache.timestamp = Date.now();
+    }
+    
+    return formattedTransaction;
   } catch (error) {
     console.error('Error in saveTransaction:', error);
     throw error;
