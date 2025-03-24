@@ -1,6 +1,6 @@
 
 import { useContext } from "react";
-import { PortfolioContext } from "./PortfolioProvider";
+import { PortfolioContext } from "./provider/PortfolioContext";
 import { PortfolioContextType } from "./types";
 
 export const usePortfolio = () => {

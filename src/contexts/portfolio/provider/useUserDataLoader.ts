@@ -1,85 +1,21 @@
-import React, { createContext, ReactNode, useEffect, useState } from "react";
-import { PortfolioContextType } from "./types";
-import { useTransactions, useTokens, useWallet, useLoans } from "./hooks";
-import { supabase } from "@/integrations/supabase/client";
 
-export const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Token } from '../types';
 
-export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
+export const useUserDataLoader = (
+  loadTokensFromStorage: () => Promise<Token[] | null>,
+  setTokens: (tokens: Token[]) => void,
+  loadWalletBalance: () => Promise<number | null>,
+  setWalletBalance: (balance: number) => void,
+  loadTransactions: () => Promise<void>,
+  saveTokensToStorage: (tokens: Token[]) => Promise<void>,
+  saveWalletBalance: (balance: number) => Promise<void>,
+  tokens: Token[],
+  walletBalance: number
+) => {
   // Track if initial data has been loaded
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
-  
-  // Initialize hooks for different parts of the portfolio functionality
-  const { 
-    transactions, 
-    isLoading, 
-    addTransaction,
-    loadTransactions,
-    seedInitialTransactions
-  } = useTransactions();
-  
-  const { 
-    tokens, 
-    setTokens,
-    addToken, 
-    removeToken, 
-    updateTokenBalance, 
-    lockToken, 
-    unlockToken,
-    getTokenByLoanId,
-    getTotalPortfolioValue, 
-    getAvailablePortfolioValue,
-    loadTokensFromStorage,
-    saveTokensToStorage,
-    toggleTokenStaking
-  } = useTokens();
-  
-  const { 
-    walletBalance, 
-    setWalletBalance,
-    addFunds, 
-    deductFunds,
-    loadWalletBalance,
-    saveWalletBalance
-  } = useWallet();
-  
-  // Initialize loan hook with functions from other hooks
-  const { loans, addLoan, repayLoan } = useLoans(
-    addTransaction,
-    lockToken,
-    unlockToken,
-    addFunds,
-    deductFunds,
-    getTokenByLoanId
-  );
-
-  // Enhance transaction with token name resolution
-  const enhancedAddTransaction = async (transaction: any) => {
-    try {
-      // Resolve token name from ID if needed
-      if (transaction.asset && !transaction.asset.includes(' ')) {
-        const token = tokens.find(t => t.id === transaction.asset);
-        if (token) {
-          transaction = {
-            ...transaction,
-            asset: token.name
-          };
-        }
-      }
-      
-      // Add transaction to history
-      const savedTransaction = await addTransaction(transaction);
-      
-      // Save tokens and wallet balance after transaction is added
-      await saveTokensToStorage(tokens);
-      await saveWalletBalance(walletBalance);
-      
-      return savedTransaction;
-    } catch (error) {
-      console.error("Error in enhancedAddTransaction:", error);
-      throw error;
-    }
-  };
 
   // Load user data on initial load
   useEffect(() => {
@@ -176,30 +112,7 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  return (
-    <PortfolioContext.Provider value={{ 
-      tokens, 
-      walletBalance,
-      transactions,
-      loans,
-      addToken, 
-      removeToken, 
-      updateTokenBalance,
-      lockToken,
-      unlockToken,
-      getTotalPortfolioValue,
-      getAvailablePortfolioValue,
-      addFunds,
-      deductFunds,
-      addTransaction: enhancedAddTransaction,
-      addLoan,
-      repayLoan,
-      isLoading,
-      toggleTokenStaking,
-      seedInitialTransactions,
-      loadTransactions // Add the loadTransactions function to the context
-    }}>
-      {children}
-    </PortfolioContext.Provider>
-  );
+  return {
+    isInitialLoadComplete
+  };
 };
