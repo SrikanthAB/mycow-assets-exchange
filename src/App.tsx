@@ -1,8 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "./components/ui/theme-provider";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "sonner";
 
 // Import layouts
 import HomeLayout from './layouts/HomeLayout';
@@ -33,11 +33,11 @@ function App() {
   console.log("Rendering App component");
   
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="system" storageKey="mycow-theme-preference">
-          <AuthProvider>
-            <PortfolioProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="system" storageKey="mycow-theme-preference">
+        <AuthProvider>
+          <PortfolioProvider>
+            <BrowserRouter>
               <Routes>
                 {/* Home route with Footer */}
                 <Route element={<HomeLayout />}>
@@ -64,12 +64,12 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>
-              <Toaster />
-            </PortfolioProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+            </BrowserRouter>
+            <Toaster />
+          </PortfolioProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
