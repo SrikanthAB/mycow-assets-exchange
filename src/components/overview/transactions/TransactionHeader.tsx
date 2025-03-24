@@ -1,13 +1,12 @@
 
 import React from "react";
-import { Download, Loader2, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import RefreshButton from "./buttons/RefreshButton";
+import DownloadButton from "./buttons/DownloadButton";
 
 interface TransactionHeaderProps {
   isRefreshing: boolean;
@@ -31,28 +30,14 @@ const TransactionHeader: React.FC<TransactionHeaderProps> = ({
         </CardDescription>
       </div>
       <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-2"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-        >
-          {isRefreshing ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCw className="h-4 w-4" />
-          )}
-          Refresh
-        </Button>
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-2"
+        <RefreshButton 
+          isRefreshing={isRefreshing} 
+          onClick={handleRefresh} 
+        />
+        <DownloadButton 
           onClick={downloadStatement}
           disabled={!hasTransactions}
-        >
-          <Download size={16} />
-          Download
-        </Button>
+        />
       </div>
     </CardHeader>
   );
