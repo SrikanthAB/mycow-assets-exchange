@@ -43,11 +43,19 @@ export const useTransactionHistory = () => {
   );
   
   // Function to refresh the transaction list
-  const handleRefresh = () => {
-    if (!isRefreshing) {
-      debouncedRefresh();
+  // Modified to return a Promise
+  const handleRefresh = useCallback((): Promise<void> => {
+    if (isRefreshing) {
+      return Promise.resolve();
     }
-  };
+    
+    return new Promise<void>((resolve) => {
+      debouncedRefresh();
+      // Since debouncedRefresh uses setTimeout internally, we can't easily await it
+      // This is a workaround to satisfy the type system
+      resolve();
+    });
+  }, [debouncedRefresh, isRefreshing]);
 
   useEffect(() => {
     console.log("Loaded transactions:", transactions?.length || 0);
