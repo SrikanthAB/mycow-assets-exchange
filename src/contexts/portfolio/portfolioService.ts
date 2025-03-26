@@ -1,8 +1,7 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Transaction } from "./types";
 
-// Cache for transactions to avoid redundant fetches
+// Modify the transaction cache to be more persistent
 let transactionCache: { 
   userId: string | null,
   data: Transaction[], 
@@ -13,13 +12,10 @@ let transactionCache: {
   timestamp: 0 
 };
 
-// Cache expiration time in milliseconds (30 seconds for development)
-const CACHE_EXPIRATION = 30 * 1000;
-
+// Remove cache expiration to keep data consistent
 export const fetchTransactions = async () => {
   try {
     console.log("Fetching transactions from Supabase");
-    // Get the current user
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -27,18 +23,12 @@ export const fetchTransactions = async () => {
       return [];
     }
     
-    // Check if we have valid cached data for this user
-    const now = Date.now();
-    if (
-      transactionCache.userId === user.id && 
-      transactionCache.data.length > 0 && 
-      now - transactionCache.timestamp < CACHE_EXPIRATION
-    ) {
+    // If we already have cached data for this user, return it
+    if (transactionCache.userId === user.id && transactionCache.data.length > 0) {
       console.log("Using cached transactions data");
       return transactionCache.data;
     }
     
-    // Fetch transactions specifically for this user with optimized query
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
@@ -50,10 +40,6 @@ export const fetchTransactions = async () => {
       throw error;
     }
     
-    console.log(`Retrieved ${data?.length || 0} transactions from Supabase for user ${user.id}`);
-    console.log('Raw transaction data:', data);
-    
-    // Transform data to match our Transaction interface
     const formattedTransactions: Transaction[] = data?.map(item => ({
       id: item.id,
       date: item.date,
@@ -69,7 +55,7 @@ export const fetchTransactions = async () => {
     transactionCache = {
       userId: user.id,
       data: formattedTransactions,
-      timestamp: now
+      timestamp: Date.now()
     };
     
     return formattedTransactions;
@@ -83,8 +69,6 @@ export const fetchTransactions = async () => {
 
 export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'date'>) => {
   try {
-    console.log('Saving transaction to Supabase:', transaction);
-    // Get the current user
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -92,10 +76,8 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
       throw new Error('User must be authenticated to save transactions');
     }
     
-    // Create a current date in ISO format
     const currentDate = new Date().toISOString();
     
-    // Prepare the transaction data with user_id
     const transactionData = {
       type: transaction.type,
       asset: transaction.asset,
@@ -107,9 +89,6 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
       date: currentDate
     };
     
-    console.log('Saving transaction with data:', transactionData);
-    
-    // Insert the transaction record
     const { data, error } = await supabase
       .from('transactions')
       .insert(transactionData)
@@ -121,9 +100,6 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
       throw error;
     }
     
-    console.log('Transaction saved successfully in Supabase:', data);
-    
-    // Format the created transaction
     const formattedTransaction: Transaction = {
       id: data.id,
       date: data.date,
@@ -135,12 +111,10 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
       toAsset: data.to_asset
     };
     
-    // Update the cache with the new transaction
+    // Always update the cache for the current user
     if (transactionCache.userId === user.id) {
       transactionCache.data = [formattedTransaction, ...transactionCache.data];
-      transactionCache.timestamp = Date.now();
     } else {
-      // If the cache is for a different user, clear it and set for current user
       transactionCache = {
         userId: user.id,
         data: [formattedTransaction],
