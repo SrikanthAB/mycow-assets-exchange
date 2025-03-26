@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Transaction } from "../../types";
 import { fetchTransactions, saveTransaction } from "../../portfolioService";
@@ -6,22 +7,18 @@ import { getAuthenticatedUser, notifyTransaction, logTransaction } from "./trans
 import { seedInitialTransactions as seedTransactions } from "./seedTransactions";
 import { supabase } from "@/integrations/supabase/client";
 
-/**
- * Hook for managing transactions with optimized loading and caching
- * @returns Object with transaction state and operations
- */
 export const useTransactions = () => {
   console.log("Initializing useTransactions hook");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast } = useToast();
   
-  // Use refs to prevent duplicate loading
+  // Use refs to prevent duplicate loading and track user
   const isLoadingRef = useRef(false);
   const hasLoadedRef = useRef(false);
   const userIdRef = useRef<string | null>(null);
 
-  // Function to load transactions from Supabase with caching
+  // Function to load transactions from Supabase with user-specific filtering
   const loadTransactions = useCallback(async () => {
     // Prevent duplicate loading requests
     if (isLoadingRef.current) return;
@@ -36,7 +33,7 @@ export const useTransactions = () => {
       
       if (!user) {
         logTransaction("No authenticated user, not loading transactions");
-        setTransactions([]);
+        setTransactions([]); // Ensure empty for unauthenticated users
         setIsLoading(false);
         isLoadingRef.current = false;
         return;
@@ -47,13 +44,7 @@ export const useTransactions = () => {
         hasLoadedRef.current = false;
       }
       
-      // If we already loaded for this user, no need to reload
-      if (hasLoadedRef.current && userIdRef.current === user.id) {
-        setIsLoading(false);
-        isLoadingRef.current = false;
-        return;
-      }
-      
+      // Always fetch fresh transactions for the current user
       userIdRef.current = user.id;
       
       logTransaction("Fetching transactions for user:", null, user.id);
@@ -64,14 +55,14 @@ export const useTransactions = () => {
         setTransactions(data);
       } else {
         logTransaction("No transactions found for this user");
-        setTransactions([]);
+        setTransactions([]); // Explicitly set to empty array
       }
       
       hasLoadedRef.current = true;
     } catch (error) {
       console.error('Error loading transactions:', error);
       notifyTransaction(toast, false, "loading");
-      setTransactions([]);
+      setTransactions([]); // Ensure empty on error
     } finally {
       setIsLoading(false);
       isLoadingRef.current = false;
@@ -95,7 +86,7 @@ export const useTransactions = () => {
       } else if (event === 'SIGNED_OUT') {
         userIdRef.current = null;
         hasLoadedRef.current = false;
-        setTransactions([]);
+        setTransactions([]); // Clear transactions on logout
       }
     });
     
