@@ -13,8 +13,8 @@ let transactionCache: {
   timestamp: 0 
 };
 
-// Cache expiration time in milliseconds (5 minutes)
-const CACHE_EXPIRATION = 5 * 60 * 1000;
+// Cache expiration time in milliseconds (30 seconds for development)
+const CACHE_EXPIRATION = 30 * 1000;
 
 export const fetchTransactions = async () => {
   try {
@@ -51,6 +51,7 @@ export const fetchTransactions = async () => {
     }
     
     console.log(`Retrieved ${data?.length || 0} transactions from Supabase for user ${user.id}`);
+    console.log('Raw transaction data:', data);
     
     // Transform data to match our Transaction interface
     const formattedTransactions: Transaction[] = data?.map(item => ({
@@ -94,19 +95,24 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
     // Create a current date in ISO format
     const currentDate = new Date().toISOString();
     
+    // Prepare the transaction data with user_id
+    const transactionData = {
+      type: transaction.type,
+      asset: transaction.asset,
+      amount: transaction.amount,
+      value: transaction.value,
+      status: transaction.status,
+      user_id: user.id, 
+      to_asset: transaction.toAsset,
+      date: currentDate
+    };
+    
+    console.log('Saving transaction with data:', transactionData);
+    
     // Insert the transaction record
     const { data, error } = await supabase
       .from('transactions')
-      .insert({
-        type: transaction.type,
-        asset: transaction.asset,
-        amount: transaction.amount,
-        value: transaction.value,
-        status: transaction.status,
-        user_id: user.id, 
-        to_asset: transaction.toAsset,
-        date: currentDate
-      })
+      .insert(transactionData)
       .select('*')
       .single();
       
@@ -133,6 +139,13 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
     if (transactionCache.userId === user.id) {
       transactionCache.data = [formattedTransaction, ...transactionCache.data];
       transactionCache.timestamp = Date.now();
+    } else {
+      // If the cache is for a different user, clear it and set for current user
+      transactionCache = {
+        userId: user.id,
+        data: [formattedTransaction],
+        timestamp: Date.now()
+      };
     }
     
     return formattedTransaction;

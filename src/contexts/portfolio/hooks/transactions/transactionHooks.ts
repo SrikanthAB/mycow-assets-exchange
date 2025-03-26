@@ -137,13 +137,18 @@ export const useTransactions = () => {
       
       notifyTransaction(toast, true);
       
+      // Force reload transactions to ensure consistency
+      setTimeout(() => {
+        loadTransactions();
+      }, 500);
+      
       return savedTransaction;
     } catch (error) {
       console.error('Error in addTransaction:', error);
       notifyTransaction(toast, false);
       throw error;
     }
-  }, [toast]);
+  }, [toast, loadTransactions]);
 
   // Helper function to seed initial transactions to Supabase (only for development)
   const seedInitialTransactions = async () => {

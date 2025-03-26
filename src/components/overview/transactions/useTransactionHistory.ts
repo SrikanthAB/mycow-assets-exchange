@@ -9,53 +9,33 @@ export const useTransactionHistory = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
   
-  // Debounce function to prevent multiple refreshes
-  const debounce = (func: Function, wait: number) => {
-    let timeout: NodeJS.Timeout;
-    return (...args: any[]) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  };
-  
-  // Debounced refresh function
-  const debouncedRefresh = useCallback(
-    debounce(async () => {
-      setIsRefreshing(true);
-      try {
-        await loadTransactions();
-        toast({
-          title: "Refreshed",
-          description: "Transaction history has been refreshed.",
-        });
-      } catch (error) {
-        console.error("Error refreshing transactions:", error);
-        toast({
-          title: "Refresh Failed",
-          description: "Could not refresh transaction history.",
-          variant: "destructive"
-        });
-      } finally {
-        setIsRefreshing(false);
-      }
-    }, 500),
-    [loadTransactions, toast]
-  );
-  
   // Function to refresh the transaction list
-  // Modified to return a Promise
-  const handleRefresh = useCallback((): Promise<void> => {
+  const handleRefresh = useCallback(async (): Promise<void> => {
     if (isRefreshing) {
       return Promise.resolve();
     }
     
-    return new Promise<void>((resolve) => {
-      debouncedRefresh();
-      // Since debouncedRefresh uses setTimeout internally, we can't easily await it
-      // This is a workaround to satisfy the type system
-      resolve();
-    });
-  }, [debouncedRefresh, isRefreshing]);
+    try {
+      setIsRefreshing(true);
+      console.log("Manually refreshing transactions");
+      await loadTransactions();
+      toast({
+        title: "Refreshed",
+        description: "Transaction history has been refreshed.",
+      });
+    } catch (error) {
+      console.error("Error refreshing transactions:", error);
+      toast({
+        title: "Refresh Failed",
+        description: "Could not refresh transaction history.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+    
+    return Promise.resolve();
+  }, [loadTransactions, isRefreshing, toast]);
 
   useEffect(() => {
     console.log("Loaded transactions:", transactions?.length || 0);
