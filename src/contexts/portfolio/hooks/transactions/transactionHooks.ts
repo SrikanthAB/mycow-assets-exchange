@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Transaction } from "../../types";
 import { fetchTransactions, saveTransaction } from "../../portfolioService";
@@ -41,6 +40,11 @@ export const useTransactions = () => {
         setIsLoading(false);
         isLoadingRef.current = false;
         return;
+      }
+      
+      // If user changed, reset the cached state
+      if (userIdRef.current !== user.id) {
+        hasLoadedRef.current = false;
       }
       
       // If we already loaded for this user, no need to reload

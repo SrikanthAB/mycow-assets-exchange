@@ -1,7 +1,5 @@
-
 import { useState } from "react";
 import { Token } from "../../types";
-import { initialTokens } from "../../initialData";
 import { loadTokensFromStorage, saveTokensToStorage } from "./tokenStorage";
 import * as tokenOps from "./tokenOperations";
 
@@ -10,7 +8,8 @@ import * as tokenOps from "./tokenOperations";
  * @returns Object with token state and operations
  */
 export const useTokens = () => {
-  const [tokens, setTokens] = useState<Token[]>(initialTokens);
+  // Start with an empty array instead of initialTokens
+  const [tokens, setTokens] = useState<Token[]>([]);
 
   const addToken = (token: Token) => {
     setTokens(prev => [...prev, token]);

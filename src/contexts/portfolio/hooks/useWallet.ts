@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useWallet = () => {
-  const [walletBalance, setWalletBalance] = useState<number>(0); // Default to 0 instead of initialWalletBalance
+  // Start with 0 instead of initialWalletBalance
+  const [walletBalance, setWalletBalance] = useState<number>(0);
 
   // Load wallet balance from Supabase
   const loadWalletBalance = async (): Promise<number | null> => {
@@ -120,7 +120,7 @@ export const useWallet = () => {
     console.log("Insufficient funds for deduction");
     return false;
   };
-
+  
   return {
     walletBalance,
     setWalletBalance,

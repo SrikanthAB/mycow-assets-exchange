@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Transaction } from "./types";
 
@@ -64,7 +63,7 @@ export const fetchTransactions = async () => {
       toAsset: item.to_asset
     })) || [];
     
-    // Update the cache
+    // Update the cache with user-specific data
     transactionCache = {
       userId: user.id,
       data: formattedTransactions,
@@ -74,6 +73,8 @@ export const fetchTransactions = async () => {
     return formattedTransactions;
   } catch (error) {
     console.error('Error in fetchTransactions:', error);
+    // Reset cache on error
+    transactionCache = { userId: null, data: [], timestamp: 0 };
     throw error;
   }
 };

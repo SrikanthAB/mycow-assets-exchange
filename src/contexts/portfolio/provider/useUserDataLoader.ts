@@ -35,7 +35,8 @@ export const useUserDataLoader = (
             console.log("Loaded user tokens:", userTokens.length);
             setTokens(userTokens);
           } else {
-            console.log("No tokens found in storage, using empty token list for new user");
+            console.log("No tokens found in storage, starting with empty token list for new user");
+            // Important: Set empty array for a new user instead of initialTokens
             setTokens([]);
           }
           
@@ -44,7 +45,8 @@ export const useUserDataLoader = (
             console.log("Loaded wallet balance:", userWalletBalance);
             setWalletBalance(userWalletBalance);
           } else {
-            console.log("No wallet balance found, setting to zero");
+            console.log("No wallet balance found, setting to zero for new user");
+            // Start with 0 balance instead of initialWalletBalance for new users
             setWalletBalance(0);
           }
           
@@ -93,9 +95,11 @@ export const useUserDataLoader = (
       if (event === 'SIGNED_IN') {
         // Reload all user data on sign in
         const userTokens = await loadTokensFromStorage();
+        // Important: Only set tokens if they exist for this user
         setTokens(userTokens || []);
         
         const userWalletBalance = await loadWalletBalance();
+        // Important: Use 0 as default instead of predefined balance for new users
         setWalletBalance(userWalletBalance !== null ? userWalletBalance : 0);
         
         await loadTransactions();
