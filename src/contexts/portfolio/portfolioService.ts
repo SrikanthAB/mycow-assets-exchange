@@ -1,7 +1,8 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Transaction } from "./types";
 
-// Modify the transaction cache to be more persistent
+// Modify the transaction cache to be more persistent for a specific user
 let transactionCache: { 
   userId: string | null,
   data: Transaction[], 
@@ -12,7 +13,6 @@ let transactionCache: {
   timestamp: 0 
 };
 
-// Remove cache expiration to keep data consistent
 export const fetchTransactions = async () => {
   try {
     console.log("Fetching transactions from Supabase");
@@ -25,7 +25,7 @@ export const fetchTransactions = async () => {
     
     // If we already have cached data for this user, return it
     if (transactionCache.userId === user.id && transactionCache.data.length > 0) {
-      console.log("Using cached transactions data");
+      console.log("Using cached transactions data for user:", user.id);
       return transactionCache.data;
     }
     
@@ -37,7 +37,7 @@ export const fetchTransactions = async () => {
     
     if (error) {
       console.error('Error fetching transactions:', error);
-      throw error;
+      return [];
     }
     
     const formattedTransactions: Transaction[] = data?.map(item => ({
@@ -61,9 +61,7 @@ export const fetchTransactions = async () => {
     return formattedTransactions;
   } catch (error) {
     console.error('Error in fetchTransactions:', error);
-    // Reset cache on error
-    transactionCache = { userId: null, data: [], timestamp: 0 };
-    throw error;
+    return [];
   }
 };
 
@@ -73,7 +71,7 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
     
     if (!user) {
       console.error('No authenticated user found when saving transaction');
-      throw new Error('User must be authenticated to save transactions');
+      return null;
     }
     
     const currentDate = new Date().toISOString();
@@ -97,7 +95,7 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
       
     if (error) {
       console.error('Error adding transaction to Supabase:', error);
-      throw error;
+      return null;
     }
     
     const formattedTransaction: Transaction = {
@@ -125,6 +123,6 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id' | 'dat
     return formattedTransaction;
   } catch (error) {
     console.error('Error in saveTransaction:', error);
-    throw error;
+    return null;
   }
 };
