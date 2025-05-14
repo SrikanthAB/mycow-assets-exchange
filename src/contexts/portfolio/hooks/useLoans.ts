@@ -22,6 +22,7 @@ export const useLoans = (
     const loadLoans = async () => {
       try {
         setIsLoading(true);
+        console.log("Starting to load loans data");
         
         // Get the current authenticated user
         const { data: { user } } = await supabase.auth.getUser();
@@ -32,6 +33,7 @@ export const useLoans = (
           return;
         }
 
+        console.log(`Loading loans for user: ${user.id}`);
         // Look for loans in local storage first
         const storedLoans = localStorage.getItem(`loans_${user.id}`);
         if (storedLoans) {
@@ -39,10 +41,13 @@ export const useLoans = (
             const parsedLoans = JSON.parse(storedLoans);
             if (Array.isArray(parsedLoans)) {
               setLoans(parsedLoans);
-              console.log("Loaded loans from local storage", parsedLoans);
+              console.log("Loaded loans from local storage:", parsedLoans);
             }
           } catch (error) {
             console.error("Error parsing stored loans:", error);
+            // Initialize with empty array if there's an error
+            setLoans([]);
+            localStorage.setItem(`loans_${user.id}`, JSON.stringify([]));
           }
         } else {
           console.log("No stored loans found for user", user.id);
@@ -52,6 +57,7 @@ export const useLoans = (
         }
 
         setIsLoading(false);
+        console.log("Finished loading loans data, isLoading set to false");
       } catch (error) {
         console.error("Error loading loans:", error);
         setIsLoading(false);
@@ -69,7 +75,7 @@ export const useLoans = (
       
       if (user) {
         localStorage.setItem(`loans_${user.id}`, JSON.stringify(updatedLoans));
-        console.log("Saved loans to local storage", updatedLoans);
+        console.log("Saved loans to local storage:", updatedLoans);
       }
     } catch (error) {
       console.error("Error saving loans to storage:", error);
@@ -116,6 +122,8 @@ export const useLoans = (
       title: "Loan Created Successfully",
       description: `You have successfully taken a loan of ₹${loan.amount.toLocaleString('en-IN')}`,
     });
+    
+    return newLoan;
   };
 
   // Repay a loan

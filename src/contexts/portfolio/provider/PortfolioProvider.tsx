@@ -70,9 +70,11 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
       tokensCount: tokens.length,
       loansCount: loans.length,
       wallet: walletBalance,
-      isLoading
+      isLoading: isLoading,
+      loansLoading: isLoansLoading,
+      transactionsLoading: isTransactionsLoading
     });
-  }, [transactions, tokens, loans, walletBalance, isLoading]);
+  }, [transactions, tokens, loans, walletBalance, isLoading, isLoansLoading, isTransactionsLoading]);
 
   // Load user data and handle authentication state changes
   useUserDataLoader(
@@ -96,29 +98,32 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
     walletBalance
   );
 
+  // Create context value object with all the necessary functions and state
+  const contextValue: PortfolioContextType = {
+    tokens, 
+    walletBalance,
+    transactions,
+    loans,
+    addToken, 
+    removeToken, 
+    updateTokenBalance,
+    lockToken,
+    unlockToken,
+    getTotalPortfolioValue,
+    getAvailablePortfolioValue,
+    addFunds,
+    deductFunds,
+    addTransaction: enhancedAddTransaction,
+    addLoan,
+    repayLoan,
+    isLoading,
+    toggleTokenStaking,
+    seedInitialTransactions,
+    loadTransactions
+  };
+
   return (
-    <PortfolioContext.Provider value={{ 
-      tokens, 
-      walletBalance,
-      transactions,
-      loans,
-      addToken, 
-      removeToken, 
-      updateTokenBalance,
-      lockToken,
-      unlockToken,
-      getTotalPortfolioValue,
-      getAvailablePortfolioValue,
-      addFunds,
-      deductFunds,
-      addTransaction: enhancedAddTransaction,
-      addLoan,
-      repayLoan,
-      isLoading,
-      toggleTokenStaking,
-      seedInitialTransactions,
-      loadTransactions
-    }}>
+    <PortfolioContext.Provider value={contextValue}>
       {children}
     </PortfolioContext.Provider>
   );

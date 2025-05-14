@@ -19,20 +19,23 @@ const IBPLs = () => {
   const [authChecking, setAuthChecking] = useState(true);
   const [repayDialogOpen, setRepayDialogOpen] = useState<boolean>(false);
   const [selectedLoanId, setSelectedLoanId] = useState<string>("");
-  const [loansReady, setLoansReady] = useState(false);
+  const [forceRender, setForceRender] = useState(false);
+  
+  // Force a re-render after initial mount to ensure we have the latest data
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setForceRender(true);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Make sure portfolio data is loaded
   useEffect(() => {
-    console.log("IBPLs component mounted, tokens:", tokens.length);
+    console.log("IBPLs component mounted or updated, tokens:", tokens.length);
     console.log("Loans data:", loans);
     console.log("Loading state:", isLoading);
-    
-    // Set loansReady to true when loans are loaded or isLoading becomes false
-    if (!isLoading) {
-      console.log("Setting loansReady to true");
-      setLoansReady(true);
-    }
-  }, [tokens, loans, isLoading]);
+  }, [tokens, loans, isLoading, forceRender]);
   
   // Calculate already used collateral value - add defensive coding
   const usedCollateralValue = loans
@@ -116,8 +119,8 @@ const IBPLs = () => {
     }
   };
   
-  // Show loading state if still checking auth or loading portfolio data
-  if (authChecking || (isLoading && !loansReady)) {
+  // Show loading state if still checking auth
+  if (authChecking) {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'}`}>
         <Navbar />
@@ -149,7 +152,7 @@ const IBPLs = () => {
     loansCount: loans.length,
     walletBalance,
     isLoading,
-    loansReady
+    forceRender
   });
   
   return (
