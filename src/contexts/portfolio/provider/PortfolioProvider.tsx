@@ -1,5 +1,5 @@
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { PortfolioContextType } from "../types";
 import { useTransactions, useTokens, useWallet, useLoans } from "../hooks";
 import { PortfolioContext } from "./PortfolioContext";
@@ -62,6 +62,17 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
 
   // Combined loading state
   const isLoading = isTransactionsLoading || isLoansLoading;
+
+  // Log initialization state
+  useEffect(() => {
+    console.log("Portfolio Provider initialized with:", {
+      transactionsCount: transactions.length,
+      tokensCount: tokens.length,
+      loansCount: loans.length,
+      wallet: walletBalance,
+      isLoading
+    });
+  }, [transactions, tokens, loans, walletBalance, isLoading]);
 
   // Load user data and handle authentication state changes
   useUserDataLoader(

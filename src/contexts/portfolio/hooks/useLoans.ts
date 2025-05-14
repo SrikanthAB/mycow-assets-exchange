@@ -14,7 +14,7 @@ export const useLoans = (
 ) => {
   // Initialize with an empty loans array
   const [loans, setLoans] = useState<Loan[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start with loading state
   const { toast } = useToast();
 
   // Load existing loans when component mounts
@@ -44,6 +44,11 @@ export const useLoans = (
           } catch (error) {
             console.error("Error parsing stored loans:", error);
           }
+        } else {
+          console.log("No stored loans found for user", user.id);
+          // Initialize with empty array if no loans found
+          setLoans([]);
+          localStorage.setItem(`loans_${user.id}`, JSON.stringify([]));
         }
 
         setIsLoading(false);
@@ -73,6 +78,7 @@ export const useLoans = (
 
   // Add a new loan
   const addLoan = (loan: Omit<Loan, 'id'>) => {
+    console.log("Adding new loan:", loan);
     const newLoan: Loan = {
       ...loan,
       id: Date.now().toString(),
@@ -114,9 +120,13 @@ export const useLoans = (
 
   // Repay a loan
   const repayLoan = async (id: string) => {
+    console.log("Repaying loan with ID:", id);
     const loan = loans.find(loan => loan.id === id);
     
-    if (!loan) return;
+    if (!loan) {
+      console.error("Loan not found for ID:", id);
+      return;
+    }
     
     // Deduct funds from wallet
     if (!deductFunds(loan.amount)) {
@@ -166,6 +176,8 @@ export const useLoans = (
         title: "Loan Repaid Successfully",
         description: "Your loan has been repaid and your collateral is now unlocked.",
       });
+    } else {
+      console.error("Could not find locked token for loan ID:", id);
     }
   };
 
