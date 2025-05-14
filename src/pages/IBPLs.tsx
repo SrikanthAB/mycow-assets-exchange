@@ -9,13 +9,16 @@ import LoanApplication from "@/components/ibpls/LoanApplication";
 import ActiveLoans from "@/components/ibpls/ActiveLoans";
 import RepayLoanDialog from "@/components/ibpls/RepayLoanDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const IBPLs = () => {
-  const { tokens, getTotalPortfolioValue, getAvailablePortfolioValue, addLoan, repayLoan, loans, walletBalance } = usePortfolio();
+  const { tokens, getTotalPortfolioValue, getAvailablePortfolioValue, addLoan, repayLoan, loans, walletBalance, isLoading } = usePortfolio();
   const { theme } = useTheme();
   const { toast } = useToast();
   
-  const [isLoading, setIsLoading] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [repayDialogOpen, setRepayDialogOpen] = useState<boolean>(false);
+  const [selectedLoanId, setSelectedLoanId] = useState<string>("");
   
   // Calculate already used collateral value - add defensive coding
   const usedCollateralValue = loans
@@ -30,9 +33,6 @@ const IBPLs = () => {
   // Max loan amount should be 66% of available portfolio value
   const maxLoanAmount = availablePortfolioValue * 0.66;
   
-  const [repayDialogOpen, setRepayDialogOpen] = useState<boolean>(false);
-  const [selectedLoanId, setSelectedLoanId] = useState<string>("");
-  
   // Load user data on initial mount
   useEffect(() => {
     const checkAuth = async () => {
@@ -45,15 +45,15 @@ const IBPLs = () => {
             variant: "destructive"
           });
         }
-        setIsLoading(false);
+        setAuthChecking(false);
       } catch (error) {
         console.error("Error checking authentication:", error);
-        setIsLoading(false);
+        setAuthChecking(false);
       }
     };
     
     checkAuth();
-  }, []);
+  }, [toast]);
   
   // Calculate repayment amount for a loan (principal only for simplicity)
   const getRepaymentAmount = (loanId: string) => {
@@ -101,13 +101,25 @@ const IBPLs = () => {
     }
   };
   
-  if (isLoading) {
+  if (authChecking || isLoading) {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#0f172a]' : 'bg-gray-50'}`}>
         <Navbar />
         <main className="pt-24 pb-16">
-          <div className="container mx-auto px-4 flex justify-center items-center py-20">
-            <p className="text-muted-foreground">Loading loan data...</p>
+          <div className="container mx-auto px-4">
+            <div className="mb-8">
+              <Skeleton className="h-8 w-64 mb-2" />
+              <Skeleton className="h-4 w-full max-w-md" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div>
+                <Skeleton className="h-[500px] rounded-xl" />
+              </div>
+              <div>
+                <Skeleton className="h-[200px] rounded-xl mb-6" />
+                <Skeleton className="h-[250px] rounded-xl" />
+              </div>
+            </div>
           </div>
         </main>
         <Footer />

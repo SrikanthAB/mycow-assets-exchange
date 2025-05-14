@@ -1,6 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loan } from "../types";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export const useLoans = (
   addTransaction: (transaction: any) => void,
@@ -10,8 +12,64 @@ export const useLoans = (
   deductFunds: (amount: number) => boolean,
   getTokenByLoanId: (loanId: string) => any
 ) => {
-  // Initialize with an empty loans array instead of sample data
+  // Initialize with an empty loans array
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  // Load existing loans when component mounts
+  useEffect(() => {
+    const loadLoans = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Get the current authenticated user
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          console.log("No authenticated user found, not loading loans");
+          setIsLoading(false);
+          return;
+        }
+
+        // Look for loans in local storage first
+        const storedLoans = localStorage.getItem(`loans_${user.id}`);
+        if (storedLoans) {
+          try {
+            const parsedLoans = JSON.parse(storedLoans);
+            if (Array.isArray(parsedLoans)) {
+              setLoans(parsedLoans);
+              console.log("Loaded loans from local storage", parsedLoans);
+            }
+          } catch (error) {
+            console.error("Error parsing stored loans:", error);
+          }
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error loading loans:", error);
+        setIsLoading(false);
+      }
+    };
+
+    loadLoans();
+  }, []);
+
+  // Helper function to save loans to local storage
+  const saveLoansToStorage = async (updatedLoans: Loan[]) => {
+    try {
+      // Get the current authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        localStorage.setItem(`loans_${user.id}`, JSON.stringify(updatedLoans));
+        console.log("Saved loans to local storage", updatedLoans);
+      }
+    } catch (error) {
+      console.error("Error saving loans to storage:", error);
+    }
+  };
 
   // Add a new loan
   const addLoan = (loan: Omit<Loan, 'id'>) => {
@@ -20,7 +78,9 @@ export const useLoans = (
       id: Date.now().toString(),
     };
     
-    setLoans(prev => [...prev, newLoan]);
+    const updatedLoans = [...loans, newLoan];
+    setLoans(updatedLoans);
+    saveLoansToStorage(updatedLoans);
     
     // Lock the collateral token
     lockToken(loan.collateralToken, loan.collateralAmount, newLoan.id);
@@ -45,25 +105,38 @@ export const useLoans = (
       value: loan.collateralValue,
       status: 'completed'
     });
+
+    toast({
+      title: "Loan Created Successfully",
+      description: `You have successfully taken a loan of ₹${loan.amount.toLocaleString('en-IN')}`,
+    });
   };
 
   // Repay a loan
-  const repayLoan = (id: string) => {
+  const repayLoan = async (id: string) => {
     const loan = loans.find(loan => loan.id === id);
     
     if (!loan) return;
     
     // Deduct funds from wallet
-    if (!deductFunds(loan.amount)) return;
+    if (!deductFunds(loan.amount)) {
+      toast({
+        title: "Insufficient Funds",
+        description: "You don't have enough funds to repay this loan.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     // Update loan status
-    setLoans(prev => 
-      prev.map(l => 
-        l.id === id 
-          ? { ...l, status: 'repaid' as const } 
-          : l
-      )
+    const updatedLoans = loans.map(l => 
+      l.id === id 
+        ? { ...l, status: 'repaid' as const } 
+        : l
     );
+    
+    setLoans(updatedLoans);
+    saveLoansToStorage(updatedLoans);
     
     // Find and unlock the token
     const lockedToken = getTokenByLoanId(id);
@@ -88,12 +161,18 @@ export const useLoans = (
         value: (lockedToken.lockedAmount || 0) * lockedToken.price,
         status: 'completed'
       });
+
+      toast({
+        title: "Loan Repaid Successfully",
+        description: "Your loan has been repaid and your collateral is now unlocked.",
+      });
     }
   };
 
   return {
     loans,
     addLoan,
-    repayLoan
+    repayLoan,
+    isLoading
   };
 };

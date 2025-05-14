@@ -14,7 +14,7 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
   // Initialize hooks for different parts of the portfolio functionality
   const { 
     transactions, 
-    isLoading, 
+    isLoading: isTransactionsLoading, 
     addTransaction,
     loadTransactions,
     seedInitialTransactions
@@ -46,7 +46,12 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
   } = useWallet();
   
   // Initialize loan hook with functions from other hooks
-  const { loans, addLoan, repayLoan } = useLoans(
+  const { 
+    loans, 
+    addLoan, 
+    repayLoan, 
+    isLoading: isLoansLoading 
+  } = useLoans(
     addTransaction,
     lockToken,
     unlockToken,
@@ -54,6 +59,9 @@ export const PortfolioProvider = ({ children }: PortfolioProviderProps) => {
     deductFunds,
     getTokenByLoanId
   );
+
+  // Combined loading state
+  const isLoading = isTransactionsLoading || isLoansLoading;
 
   // Load user data and handle authentication state changes
   useUserDataLoader(
