@@ -1,7 +1,7 @@
 
-// Export everything from the provider directory
+// Export all components from the portfolio context
 export * from './provider';
 export * from './types';
 export * from './usePortfolio';
-export * from './initialData';
+export * from './hooks';
 export * from './portfolioService';
